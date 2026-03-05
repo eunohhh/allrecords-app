@@ -12,6 +12,8 @@ import {
   getStoredToken,
   setStoredToken,
   reviewLogin,
+  emailPasswordSignIn,
+  emailPasswordSignUp,
   type AppUser,
 } from '@/lib/auth-api';
 
@@ -33,6 +35,8 @@ type AuthContextValue = {
   startGoogleLogin: () => Promise<void>;
   startAppleLogin: () => Promise<void>;
   startReviewLogin: (email: string, password: string) => Promise<void>;
+  startEmailPasswordLogin: (email: string, password: string) => Promise<void>;
+  startEmailPasswordSignUp: (name: string, email: string, password: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
@@ -238,6 +242,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     [setErrorStatus],
   );
 
+  const startEmailPasswordLogin = useCallback(
+    async (email: string, password: string) => {
+      try {
+        setStatus({ tone: 'neutral', label: 'logging in...' });
+        const data = await emailPasswordSignIn({ email, password, rememberMe: true });
+        await setStoredToken(data.accessToken);
+        setAccessToken(data.accessToken);
+        setUser(data.user);
+        setStatus({ tone: 'success', label: 'authenticated' });
+      } catch (error) {
+        setErrorStatus(formatApiError(error));
+        throw error;
+      }
+    },
+    [setErrorStatus],
+  );
+
+  const startEmailPasswordSignUp = useCallback(
+    async (name: string, email: string, password: string) => {
+      try {
+        setStatus({ tone: 'neutral', label: 'creating account...' });
+        const data = await emailPasswordSignUp({ name, email, password });
+        await setStoredToken(data.accessToken);
+        setAccessToken(data.accessToken);
+        setUser(data.user);
+        setStatus({ tone: 'success', label: 'authenticated' });
+      } catch (error) {
+        setErrorStatus(formatApiError(error));
+        throw error;
+      }
+    },
+    [setErrorStatus],
+  );
+
   const logout = useCallback(async () => {
     await clearSession();
     setStatus({ tone: 'neutral', label: 'logged out' });
@@ -272,11 +310,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       startGoogleLogin,
       startAppleLogin,
       startReviewLogin,
+      startEmailPasswordLogin,
+      startEmailPasswordSignUp,
       refreshProfile: () => refreshProfile(),
       logout,
       deleteAccount,
     }),
-    [apiBaseUrl, redirectUrl, status, accessToken, user, isLoading, startGoogleLogin, startAppleLogin, startReviewLogin, refreshProfile, logout, deleteAccount],
+    [
+      apiBaseUrl,
+      redirectUrl,
+      status,
+      accessToken,
+      user,
+      isLoading,
+      startGoogleLogin,
+      startAppleLogin,
+      startReviewLogin,
+      startEmailPasswordLogin,
+      startEmailPasswordSignUp,
+      refreshProfile,
+      logout,
+      deleteAccount,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -17,13 +17,23 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function LoginScreen() {
-  const { startGoogleLogin, startAppleLogin, startReviewLogin, user, status } = useAuth();
+  const {
+    startGoogleLogin,
+    startAppleLogin,
+    startEmailPasswordLogin,
+    startEmailPasswordSignUp,
+    user,
+    status,
+  } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
 
-  const [showReviewLogin, setShowReviewLogin] = useState(false);
+  const [showEmailAuth, setShowEmailAuth] = useState(false);
+  const [emailAuthMode, setEmailAuthMode] = useState<'sign-in' | 'sign-up'>('sign-in');
+
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -35,9 +45,19 @@ export default function LoginScreen() {
 
   const isLoading = status.tone === 'neutral' && status.label !== 'idle';
 
-  const handleReviewLogin = async () => {
-    if (!email.trim() || !password.trim()) return;
-    await startReviewLogin(email.trim(), password.trim());
+  const handleEmailAuth = async () => {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedEmail || !trimmedPassword) return;
+
+    if (emailAuthMode === 'sign-up') {
+      if (!name.trim()) return;
+      await startEmailPasswordSignUp(name.trim(), trimmedEmail, trimmedPassword);
+      return;
+    }
+
+    await startEmailPasswordLogin(trimmedEmail, trimmedPassword);
   };
 
   return (
@@ -53,8 +73,20 @@ export default function LoginScreen() {
       <View style={styles.footer}>
         {isLoading ? (
           <ActivityIndicator size="large" color={theme.tint} />
-        ) : showReviewLogin ? (
+        ) : showEmailAuth ? (
           <View style={styles.reviewForm}>
+            {emailAuthMode === 'sign-up' && (
+              <TextInput
+                style={[styles.input, { color: theme.text, borderColor: theme.icon }]}
+                placeholder="Name"
+                placeholderTextColor={theme.icon}
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+                autoCorrect={false}
+              />
+            )}
+
             <TextInput
               style={[styles.input, { color: theme.text, borderColor: theme.icon }]}
               placeholder="Email"
@@ -74,15 +106,44 @@ export default function LoginScreen() {
               secureTextEntry
             />
             <TouchableOpacity
-              style={[styles.button, styles.primaryButton, (!email.trim() || !password.trim()) && styles.buttonDisabled]}
-              onPress={handleReviewLogin}
+              style={[
+                styles.button,
+                styles.primaryButton,
+                ((emailAuthMode === 'sign-up' && !name.trim()) || !email.trim() || !password.trim()) &&
+                  styles.buttonDisabled,
+              ]}
+              onPress={handleEmailAuth}
               activeOpacity={0.8}
-              disabled={!email.trim() || !password.trim()}
+              disabled={(emailAuthMode === 'sign-up' && !name.trim()) || !email.trim() || !password.trim()}
             >
-              <Text style={styles.buttonText}>Sign In</Text>
+              <Text style={styles.buttonText}>
+                {emailAuthMode === 'sign-up' ? 'Create Account' : 'Sign In'}
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.linkButton} onPress={() => setShowReviewLogin(false)}>
+            {emailAuthMode === 'sign-in' ? (
+              <TouchableOpacity
+                style={styles.linkButton}
+                onPress={() => setEmailAuthMode('sign-up')}
+              >
+                <Text style={[styles.linkText, { color: theme.icon }]}>Create an account</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.linkButton}
+                onPress={() => setEmailAuthMode('sign-in')}
+              >
+                <Text style={[styles.linkText, { color: theme.icon }]}>Back to sign in</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={styles.linkButton}
+              onPress={() => {
+                setShowEmailAuth(false);
+                setEmailAuthMode('sign-in');
+              }}
+            >
               <Text style={[styles.linkText, { color: theme.icon }]}>Back</Text>
             </TouchableOpacity>
           </View>
@@ -105,8 +166,11 @@ export default function LoginScreen() {
               <Text style={[styles.buttonText, styles.googleButtonText]}>Continue with Google</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.button, styles.emailButton]} onPress={() => setShowReviewLogin(true)}>
-              <Text style={[styles.buttonText, styles.emailButtonText]}>Sign in with Email</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.emailButton]}
+              onPress={() => setShowEmailAuth(true)}
+            >
+              <Text style={[styles.buttonText, styles.emailButtonText]}>Continue with Email</Text>
             </TouchableOpacity>
           </View>
         )}

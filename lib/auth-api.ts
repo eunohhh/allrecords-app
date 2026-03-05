@@ -57,6 +57,37 @@ export const reviewLogin = async (email: string, password: string): Promise<Toke
   }
 };
 
+// Better Auth (email & password)
+// Docs: https://better-auth.com/docs/authentication/email-password
+// Note: Depending on server configuration, the response may not match TokenResponse exactly.
+// We normalize a few common shapes to keep the app session handling consistent.
+export const emailPasswordSignUp = async (params: {
+  name: string;
+  email: string;
+  password: string;
+  image?: string;
+}): Promise<TokenResponse> => {
+  try {
+    const response = await api.post('/sign-up/email', params);
+    return normalizeTokenResponse(response.data);
+  } catch (error) {
+    throw normalizeApiError(error);
+  }
+};
+
+export const emailPasswordSignIn = async (params: {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}): Promise<TokenResponse> => {
+  try {
+    const response = await api.post('/sign-in/email', params);
+    return normalizeTokenResponse(response.data);
+  } catch (error) {
+    throw normalizeApiError(error);
+  }
+};
+
 export const fetchMe = async (token: string): Promise<AppUser | null> => {
   try {
     const response = await api.get('/auth/app/me', {
@@ -110,4 +141,31 @@ const normalizeApiError = (error: unknown): ApiError => {
     return { message: error.message };
   }
   return { message: 'Unknown error' };
+};
+
+const normalizeTokenResponse = (data: unknown): TokenResponse => {
+  if (typeof data !== 'object' || data === null) {
+    throw new Error('Invalid auth response');
+  }
+
+  const anyData = data as any;
+  const accessToken =
+    (typeof anyData.accessToken === 'string' && anyData.accessToken) ||
+    (typeof anyData.token === 'string' && anyData.token) ||
+    (typeof anyData.session?.token === 'string' && anyData.session.token);
+
+  const user = anyData.user as AppUser | undefined;
+
+  if (!accessToken || !user) {
+    // If the server is configured cookie-first, mobile may not get a token.
+    // In that case, fail explicitly so we can adjust endpoint config.
+    throw new Error('Auth response missing access token or user');
+  }
+
+  return {
+    accessToken,
+    tokenType: anyData.tokenType ?? 'Bearer',
+    expiresIn: typeof anyData.expiresIn === 'number' ? anyData.expiresIn : 0,
+    user,
+  };
 };
