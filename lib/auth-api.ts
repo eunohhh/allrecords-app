@@ -149,17 +149,24 @@ const normalizeTokenResponse = (data: unknown): TokenResponse => {
   }
 
   const anyData = data as any;
+  const payload = anyData?.data ?? anyData;
+
   const accessToken =
-    (typeof anyData.accessToken === 'string' && anyData.accessToken) ||
-    (typeof anyData.token === 'string' && anyData.token) ||
-    (typeof anyData.session?.token === 'string' && anyData.session.token);
+    (typeof payload.accessToken === 'string' && payload.accessToken) ||
+    (typeof payload.token === 'string' && payload.token) ||
+    (typeof payload.session?.token === 'string' && payload.session.token) ||
+    (typeof payload.session?.accessToken === 'string' && payload.session.accessToken);
 
-  const user = anyData.user as AppUser | undefined;
+  const user = (payload.user ?? payload.session?.user) as AppUser | undefined;
 
-  if (!accessToken || !user) {
+  if (!accessToken) {
     // If the server is configured cookie-first, mobile may not get a token.
     // In that case, fail explicitly so we can adjust endpoint config.
-    throw new Error('Auth response missing access token or user');
+    throw new Error('Auth response missing access token');
+  }
+
+  if (!user) {
+    throw new Error('Auth response missing user');
   }
 
   return {

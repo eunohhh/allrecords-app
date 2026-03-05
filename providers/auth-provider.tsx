@@ -250,13 +250,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await setStoredToken(data.accessToken);
         setAccessToken(data.accessToken);
         setUser(data.user);
+        await refreshProfile(data.accessToken);
         setStatus({ tone: 'success', label: 'authenticated' });
       } catch (error) {
         setErrorStatus(formatApiError(error));
         throw error;
       }
     },
-    [setErrorStatus],
+    [setErrorStatus, refreshProfile],
   );
 
   const startEmailPasswordSignUp = useCallback(
@@ -267,13 +268,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await setStoredToken(data.accessToken);
         setAccessToken(data.accessToken);
         setUser(data.user);
+        await refreshProfile(data.accessToken);
         setStatus({ tone: 'success', label: 'authenticated' });
       } catch (error) {
         setErrorStatus(formatApiError(error));
         throw error;
       }
     },
-    [setErrorStatus],
+    [setErrorStatus, refreshProfile],
   );
 
   const logout = useCallback(async () => {
