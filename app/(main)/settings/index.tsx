@@ -41,6 +41,11 @@ export default function SettingsScreen() {
     <ThemedView style={styles.container}>
       <View style={[styles.section, { backgroundColor: theme.background, borderColor: theme.icon }]}>
         <SettingsItem
+          icon="person-circle-outline"
+          title="내 정보"
+          onPress={() => router.push('/settings/my-info' as Href)}
+        />
+        <SettingsItem
           icon="notifications-outline"
           title="알림 설정"
           onPress={() => router.push('/settings/notifications' as Href)}

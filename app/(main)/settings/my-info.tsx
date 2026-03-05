@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
-import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -9,9 +9,36 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function MyInfoScreen() {
-  const { user } = useAuth();
+  const { user, deleteAccount } = useAuth();
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const onPressDeleteAccount = useCallback(() => {
+    Alert.alert(
+      '계정을 삭제할까요?',
+      '계정을 삭제하면 복구할 수 없어요. 계속 진행할까요?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: async () => {
+            if (isDeleting) return;
+            setIsDeleting(true);
+            try {
+              await deleteAccount();
+            } catch (error) {
+              // auth-provider에서 status로도 관리하지만, 사용자에게 즉시 표시
+              Alert.alert('계정 삭제 실패', error instanceof Error ? error.message : '알 수 없는 오류');
+            } finally {
+              setIsDeleting(false);
+            }
+          },
+        },
+      ],
+    );
+  }, [deleteAccount, isDeleting]);
 
   return (
     <ThemedView style={styles.container}>
@@ -42,6 +69,28 @@ export default function MyInfoScreen() {
             <ThemedText type="defaultSemiBold">Role</ThemedText>
             <ThemedText style={{ color: theme.icon }}>{user?.role}</ThemedText>
           </View>
+        </View>
+
+        <View style={[styles.dangerSection, { borderColor: theme.icon, backgroundColor: theme.background }]}>
+          <ThemedText type="defaultSemiBold" style={styles.dangerTitle}>
+            계정 관리
+          </ThemedText>
+          <ThemedText style={{ color: theme.icon, opacity: 0.9 }}>
+            계정을 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
+          </ThemedText>
+          <Pressable
+            onPress={onPressDeleteAccount}
+            disabled={isDeleting}
+            style={({ pressed }) => [
+              styles.deleteButton,
+              pressed && { opacity: 0.8 },
+              isDeleting && { opacity: 0.5 },
+            ]}
+          >
+            <ThemedText style={styles.deleteButtonText}>
+              {isDeleting ? '삭제 중…' : '계정 삭제'}
+            </ThemedText>
+          </Pressable>
         </View>
 
       </ScrollView>
@@ -95,5 +144,26 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     width: '100%',
-  }
+  },
+  dangerSection: {
+    borderRadius: 16,
+    padding: 16,
+    gap: 12,
+    borderWidth: 1,
+  },
+  dangerTitle: {
+    fontSize: 14,
+  },
+  deleteButton: {
+    marginTop: 4,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    backgroundColor: '#E53935',
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
 });

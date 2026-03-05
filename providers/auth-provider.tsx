@@ -4,6 +4,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 
 import {
   clearStoredToken,
+  deleteMe,
   exchangeCode,
   fetchMe,
   formatApiError,
@@ -34,6 +35,7 @@ type AuthContextValue = {
   startReviewLogin: (email: string, password: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -241,6 +243,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setStatus({ tone: 'neutral', label: 'logged out' });
   }, [clearSession]);
 
+  const deleteAccount = useCallback(async () => {
+    const token = accessToken;
+    if (!token) {
+      setStatus({ tone: 'warning', label: 'missing token' });
+      return;
+    }
+
+    try {
+      setStatus({ tone: 'neutral', label: 'deleting account...' });
+      await deleteMe(token);
+      await clearSession();
+      setStatus({ tone: 'neutral', label: 'account deleted' });
+    } catch (error) {
+      setErrorStatus(formatApiError(error));
+      throw error;
+    }
+  }, [accessToken, clearSession, setErrorStatus]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       apiBaseUrl,
@@ -254,8 +274,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       startReviewLogin,
       refreshProfile: () => refreshProfile(),
       logout,
+      deleteAccount,
     }),
-    [apiBaseUrl, redirectUrl, status, accessToken, user, isLoading, startGoogleLogin, startAppleLogin, startReviewLogin, refreshProfile, logout],
+    [apiBaseUrl, redirectUrl, status, accessToken, user, isLoading, startGoogleLogin, startAppleLogin, startReviewLogin, refreshProfile, logout, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

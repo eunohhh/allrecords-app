@@ -72,6 +72,17 @@ export const fetchMe = async (token: string): Promise<AppUser | null> => {
   }
 };
 
+export const deleteMe = async (token: string): Promise<{ ok: true }> => {
+  try {
+    const response = await api.delete('/auth/app/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data as { ok: true };
+  } catch (error) {
+    throw normalizeApiError(error);
+  }
+};
+
 export const formatApiError = (error: unknown): string => {
   const apiError = normalizeApiError(error);
   if (apiError.code) {
