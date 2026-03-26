@@ -1,11 +1,13 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import {
+  bulkCreateCares,
   createCare,
   deleteCare,
   getCaresForCalendar,
   toggleCareComplete,
   updateCare,
+  type BulkCreateCaresInput,
   type CreateCareInput,
   type SittingCare,
   type UpdateCareInput,
@@ -26,6 +28,7 @@ type SittingContextValue = {
   updateCare: (careId: string, data: UpdateCareInput) => Promise<SittingCare>;
   deleteCare: (careId: string) => Promise<void>;
   toggleComplete: (careId: string) => Promise<SittingCare>;
+  bulkCreateCares: (bookingId: string, data: BulkCreateCaresInput) => Promise<SittingCare[]>;
   getCaresByDate: (dateString: string) => SittingCare[];
 };
 
@@ -114,6 +117,16 @@ export const SittingProvider = ({ children }: { children: React.ReactNode }) => 
     [accessToken],
   );
 
+  const handleBulkCreateCares = useCallback(
+    async (bookingId: string, data: BulkCreateCaresInput): Promise<SittingCare[]> => {
+      if (!accessToken) throw new Error('Not authenticated');
+      const created = await bulkCreateCares(accessToken, bookingId, data);
+      await fetchCaresForMonth();
+      return created;
+    },
+    [accessToken, fetchCaresForMonth],
+  );
+
   const getCaresByDate = useCallback(
     (dateString: string): SittingCare[] => {
       // dateString: "2026-01-25" 형식
@@ -152,6 +165,7 @@ export const SittingProvider = ({ children }: { children: React.ReactNode }) => 
       updateCare: handleUpdateCare,
       deleteCare: handleDeleteCare,
       toggleComplete: handleToggleComplete,
+      bulkCreateCares: handleBulkCreateCares,
       getCaresByDate,
     }),
     [
@@ -165,6 +179,7 @@ export const SittingProvider = ({ children }: { children: React.ReactNode }) => 
       handleUpdateCare,
       handleDeleteCare,
       handleToggleComplete,
+      handleBulkCreateCares,
       getCaresByDate,
     ],
   );

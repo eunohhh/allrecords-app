@@ -109,6 +109,12 @@ export type UpdateBookingInput = {
   addressSnapshot?: string;
 };
 
+export type BulkCreateCaresInput = {
+  startDateKst: string; // "2026-03-01"
+  endDateKst: string; // "2026-03-15"
+  careTimeKst: string; // "18:00"
+};
+
 // ==================== API CLIENT ====================
 
 const api = axios.create({
@@ -246,6 +252,19 @@ export const updateCare = async (
 
 export const deleteCare = async (token: string, careId: string): Promise<void> => {
   await api.delete(`/sitting/cares/${careId}`, authHeaders(token));
+};
+
+export const bulkCreateCares = async (
+  token: string,
+  bookingId: string,
+  data: BulkCreateCaresInput,
+): Promise<SittingCare[]> => {
+  const response = await api.post(
+    `/sitting/bookings/${bookingId}/bulk-cares`,
+    data,
+    authHeaders(token),
+  );
+  return response.data;
 };
 
 export const toggleCareComplete = async (token: string, careId: string): Promise<SittingCare> => {

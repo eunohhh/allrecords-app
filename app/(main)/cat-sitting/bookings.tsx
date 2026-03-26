@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BookingCreateModal } from '@/components/booking-create-modal';
+import { BulkCareCreateModal } from '@/components/bulk-care-create-modal';
 import { ClientCreateModal } from '@/components/client-create-modal';
 import { ClientPickerModal } from '@/components/client-picker-modal';
 import { ContactMethodPickerModal } from '@/components/contact-method-picker-modal';
@@ -64,6 +65,8 @@ export default function BookingListScreen() {
   const [showBookingDatePicker, setShowBookingDatePicker] = useState(false);
   const [showBookingTimePicker, setShowBookingTimePicker] = useState(false);
   const [pendingBookingOpen, setPendingBookingOpen] = useState(false);
+  const [showBulkCareModal, setShowBulkCareModal] = useState(false);
+  const [selectedBookingForBulk, setSelectedBookingForBulk] = useState<SittingBooking | null>(null);
 
   const loadBookings = useCallback(async () => {
     if (!accessToken) return [];
@@ -423,6 +426,23 @@ export default function BookingListScreen() {
                   <Text style={[pageStyles.cardSub, { color: theme.icon }]}>
                     {formatReservationTime(booking.reservationDate)}
                   </Text>
+                  <Pressable
+                    style={[
+                      pageStyles.bulkCareButton,
+                      {
+                        backgroundColor: theme.tint + '15',
+                        borderColor: theme.tint + '40',
+                      },
+                    ]}
+                    onPress={() => {
+                      setSelectedBookingForBulk(booking);
+                      setShowBulkCareModal(true);
+                    }}
+                  >
+                    <Text style={[pageStyles.bulkCareButtonText, { color: theme.tint }]}>
+                      케어 한번에 등록
+                    </Text>
+                  </Pressable>
                 </View>
               ))
             )}
@@ -529,6 +549,15 @@ export default function BookingListScreen() {
         isDark={isDark}
         theme={theme}
       />
+
+      <BulkCareCreateModal
+        visible={showBulkCareModal}
+        onClose={() => {
+          setShowBulkCareModal(false);
+          setSelectedBookingForBulk(null);
+        }}
+        booking={selectedBookingForBulk}
+      />
     </SafeAreaView>
   );
 }
@@ -591,6 +620,17 @@ const pageStyles = StyleSheet.create({
   cardSub: {
     fontSize: 13,
     marginTop: 6,
+  },
+  bulkCareButton: {
+    marginTop: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  bulkCareButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   actionRow: {
     paddingTop: 8,
