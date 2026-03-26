@@ -430,8 +430,8 @@ export default function BookingListScreen() {
                     style={[
                       pageStyles.bulkCareButton,
                       {
-                        backgroundColor: theme.tint + '15',
-                        borderColor: theme.tint + '40',
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : theme.tint + '15',
+                        borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.tint + '40',
                       },
                     ]}
                     onPress={() => {
