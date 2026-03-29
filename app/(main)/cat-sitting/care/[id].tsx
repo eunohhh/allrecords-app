@@ -29,6 +29,7 @@ export default function CareDetailScreen() {
 
   const [care, setCare] = useState<SittingCare | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadCare = useCallback(async () => {
     if (!accessToken || !id) return;
@@ -63,9 +64,15 @@ export default function CareDetailScreen() {
         text: '삭제',
         style: 'destructive',
         onPress: async () => {
-          await deleteCare(care.id);
-          await fetchCaresForMonth();
-          router.back();
+          setIsDeleting(true);
+          try {
+            await deleteCare(care.id);
+            await fetchCaresForMonth();
+            router.back();
+          } catch {
+            setIsDeleting(false);
+            Alert.alert('오류', '삭제에 실패했습니다.');
+          }
         },
       },
     ]);
@@ -117,8 +124,9 @@ export default function CareDetailScreen() {
   const isCompleted = !!care.completedAt;
 
   return (
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
     <ScrollView
-      style={[styles.container, { backgroundColor: theme.background }]}
+      style={styles.container}
       contentContainerStyle={styles.content}
     >
       {/* 상태 배지 */}
@@ -236,6 +244,12 @@ export default function CareDetailScreen() {
         </Pressable>
       </View>
     </ScrollView>
+    {isDeleting && (
+      <View style={styles.deletingOverlay}>
+        <ActivityIndicator size="large" color="#FFFFFF" />
+      </View>
+    )}
+    </View>
   );
 }
 
@@ -311,5 +325,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  deletingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
