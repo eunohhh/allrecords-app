@@ -53,7 +53,7 @@ export default function CalendarSettingsScreen() {
         <View style={[styles.section, { borderColor: theme.icon }]}>
           <View style={styles.descRow}>
             <ThemedText style={[styles.descText, { color: theme.icon }]}>
-              연동하면 케어 일정이 자동으로 Google 캘린더에 동기화됩니다. 케어 생성, 수정, 삭제 시
+              연동하면 돌봄 일정이 자동으로 Google 캘린더에 동기화됩니다. 돌봄 생성, 수정, 삭제 시
               캘린더에 자동 반영됩니다.
             </ThemedText>
           </View>

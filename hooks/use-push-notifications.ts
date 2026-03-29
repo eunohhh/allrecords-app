@@ -162,7 +162,7 @@ export function usePushNotifications(accessToken: string | null) {
       console.log('Notification response:', response);
       const data = response.notification.request.content.data;
       if (data?.type === 'care_reminder' && data?.careId) {
-        // TODO: 케어 상세 화면으로 네비게이션
+        // TODO: 돌봄 상세 화면으로 네비게이션
         console.log('Navigate to care:', data.careId);
       }
     });

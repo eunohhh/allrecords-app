@@ -14,17 +14,15 @@ import {
   View,
 } from 'react-native';
 
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useAuth } from '@/providers/auth-provider';
-import { useSitting } from '@/providers/sitting-provider';
+import { styles } from '@/components/add-care-modal.styles';
 import { BookingCreateModal } from '@/components/booking-create-modal';
 import { BookingPickerModal } from '@/components/booking-picker-modal';
 import { ClientCreateModal } from '@/components/client-create-modal';
 import { ClientPickerModal } from '@/components/client-picker-modal';
 import { ContactMethodPickerModal } from '@/components/contact-method-picker-modal';
 import { DateTimePickerModal } from '@/components/date-time-picker-modal';
-import { styles } from '@/components/add-care-modal.styles';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import {
   createBooking,
   createClient,
@@ -33,6 +31,8 @@ import {
   type SittingBooking,
   type SittingClient,
 } from '@/lib/sitting-api';
+import { useAuth } from '@/providers/auth-provider';
+import { useSitting } from '@/providers/sitting-provider';
 
 type Props = {
   visible: boolean;
@@ -381,9 +381,9 @@ export function AddCareModal({ visible, onClose, initialDate }: Props) {
 
       await fetchCaresForMonth();
       handleClose();
-      Alert.alert('완료', '케어가 추가되었습니다.');
+      Alert.alert('완료', '돌봄이 추가되었습니다.');
     } catch (error) {
-      Alert.alert('오류', '케어 추가에 실패했습니다.');
+      Alert.alert('오류', '돌봄 추가에 실패했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -508,7 +508,7 @@ export function AddCareModal({ visible, onClose, initialDate }: Props) {
             >
               {/* 헤더 */}
               <View style={styles.header}>
-              <Text style={[styles.title, { color: theme.text }]}>케어 추가</Text>
+              <Text style={[styles.title, { color: theme.text }]}>돌봄 추가</Text>
               <Pressable onPress={handleClose}>
                 <Text style={[styles.closeButton, { color: theme.tint }]}>취소</Text>
               </Pressable>

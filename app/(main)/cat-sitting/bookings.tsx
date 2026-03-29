@@ -1,13 +1,13 @@
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    Alert,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -17,19 +17,19 @@ import { ClientCreateModal } from '@/components/client-create-modal';
 import { ClientPickerModal } from '@/components/client-picker-modal';
 import { ContactMethodPickerModal } from '@/components/contact-method-picker-modal';
 import { DateTimePickerModal } from '@/components/date-time-picker-modal';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useAuth } from '@/providers/auth-provider';
 import {
-  createBooking,
-  createClient,
-  getBookings,
-  getClients,
-  updateBookingStatus,
-  type SittingBooking,
-  type SittingClient,
+    createBooking,
+    createClient,
+    getBookings,
+    getClients,
+    updateBookingStatus,
+    type SittingBooking,
+    type SittingClient,
 } from '@/lib/sitting-api';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useAuth } from '@/providers/auth-provider';
 
 const contactMethodOptions = ['카톡', '숨고', '기타'];
 
@@ -467,7 +467,7 @@ export default function BookingListScreen() {
                       }}
                     >
                       <Text style={[pageStyles.bulkCareButtonText, { color: theme.tint }]}>
-                        케어 한번에 등록
+                        돌봄 한번에 등록
                       </Text>
                     </Pressable>
                     <Pressable

@@ -27,7 +27,7 @@ export default function AdminTabs({ activeTab, onChangeTab, theme }: AdminTabsPr
               },
             ]}
           >
-            {tab === 'clients' ? '고객' : tab === 'bookings' ? '예약' : '케어'}
+            {tab === 'clients' ? '고객' : tab === 'bookings' ? '예약' : '돌봄'}
           </Text>
         </Pressable>
       ))}

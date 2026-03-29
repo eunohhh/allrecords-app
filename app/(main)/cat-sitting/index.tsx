@@ -575,7 +575,7 @@ export default function CatSittingScreen() {
         </Pressable>
       </Modal>
 
-      {/* 케어 추가 모달 */}
+      {/* 돌봄 추가 모달 */}
       <AddCareModal
         visible={addCareModalVisible}
         onClose={() => setAddCareModalVisible(false)}

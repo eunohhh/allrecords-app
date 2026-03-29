@@ -1,21 +1,21 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Linking,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    Alert,
+    Linking,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { getCare, type SittingCare } from '@/lib/sitting-api';
 import { useAuth } from '@/providers/auth-provider';
 import { useSitting } from '@/providers/sitting-provider';
-import { getCare, type SittingCare } from '@/lib/sitting-api';
 
 export default function CareDetailScreen() {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function CareDetailScreen() {
       const data = await getCare(accessToken, id);
       setCare(data);
     } catch (error) {
-      Alert.alert('오류', '케어 정보를 불러올 수 없습니다.');
+      Alert.alert('오류', '돌봄 정보를 불러올 수 없습니다.');
       router.back();
     } finally {
       setIsLoading(false);
@@ -58,7 +58,7 @@ export default function CareDetailScreen() {
   const handleDelete = useCallback(async () => {
     if (!care) return;
 
-    Alert.alert('케어 삭제', '정말로 이 케어 기록을 삭제하시겠습니까?', [
+    Alert.alert('돌봄 삭제', '정말로 이 돌봄 기록을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       {
         text: '삭제',
@@ -115,7 +115,7 @@ export default function CareDetailScreen() {
     return (
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <Text style={[styles.errorText, { color: theme.text }]}>
-          케어 정보를 찾을 수 없습니다.
+          돌봄 정보를 찾을 수 없습니다.
         </Text>
       </View>
     );
@@ -154,9 +154,9 @@ export default function CareDetailScreen() {
         </Text>
       </View>
 
-      {/* 케어 시간 */}
+      {/* 돌봄 시간 */}
       <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: theme.icon }]}>케어 시간</Text>
+        <Text style={[styles.sectionLabel, { color: theme.icon }]}>돌봄 시간</Text>
         <Text style={[styles.sectionValue, { color: theme.text }]}>
           {formatDateTime(care.careTime)}
         </Text>

@@ -70,7 +70,7 @@ export default function AdminCaresTab({
               color: theme.text,
             },
           ]}
-          placeholder="케어 검색 (고객/주소)"
+          placeholder="돌봄 검색 (고객/주소)"
           placeholderTextColor={theme.icon}
           value={careQuery}
           onChangeText={onChangeCareQuery}
@@ -134,7 +134,7 @@ export default function AdminCaresTab({
         <ScrollView contentContainerStyle={styles.list} keyboardShouldPersistTaps="handled">
           {filteredCares.length === 0 ? (
             <Text style={[styles.emptyText, { color: theme.icon }]}>
-              {cares.length === 0 ? '등록된 케어가 없습니다.' : '검색 결과가 없습니다.'}
+              {cares.length === 0 ? '등록된 돌봄이 없습니다.' : '검색 결과가 없습니다.'}
             </Text>
           ) : (
             filteredCares.map((care) => (
@@ -174,7 +174,7 @@ export default function AdminCaresTab({
         style={[styles.primaryButton, { backgroundColor: theme.tint }]}
         onPress={onOpenCareCreate}
       >
-        <Text style={styles.primaryButtonText}>케어 추가</Text>
+        <Text style={styles.primaryButtonText}>돌봄 추가</Text>
       </Pressable>
     </>
   );

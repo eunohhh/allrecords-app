@@ -12,39 +12,39 @@ import { ContactMethodPickerModal } from '@/components/contact-method-picker-mod
 import { DateTimePickerModal } from '@/components/date-time-picker-modal';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import useAdminBookingState from './hooks/use-admin-booking-state';
-import useAdminCareState from './hooks/use-admin-care-state';
-import useAdminClientState from './hooks/use-admin-client-state';
+import {
+    createBooking,
+    createClient,
+    deleteCare,
+    deleteClient,
+    getBookings,
+    getCaresForCalendar,
+    getClients,
+    updateBooking,
+    updateBookingStatus,
+    updateCare,
+    updateClient,
+    type SittingBooking,
+    type SittingCare,
+    type SittingClient,
+} from '@/lib/sitting-api';
+import { useAuth } from '@/providers/auth-provider';
+import styles from './admin-styles';
+import type { AdminTab } from './admin-types';
 import AdminBookingsTab from './components/admin/AdminBookingsTab';
 import AdminCaresTab from './components/admin/AdminCaresTab';
 import AdminClientsTab from './components/admin/AdminClientsTab';
 import AdminHeader from './components/admin/AdminHeader';
 import AdminTabs from './components/admin/AdminTabs';
+import useAdminBookingState from './hooks/use-admin-booking-state';
+import useAdminCareState from './hooks/use-admin-care-state';
+import useAdminClientState from './hooks/use-admin-client-state';
 import {
-  createBooking,
-  createClient,
-  deleteCare,
-  deleteClient,
-  getBookings,
-  getCaresForCalendar,
-  getClients,
-  updateBooking,
-  updateBookingStatus,
-  updateCare,
-  updateClient,
-  type SittingBooking,
-  type SittingCare,
-  type SittingClient,
-} from '@/lib/sitting-api';
-import { useAuth } from '@/providers/auth-provider';
-import styles from './admin-styles';
-import type { AdminTab } from './admin-types';
-import {
-  buildCalendarRange,
-  formatShortDate,
-  normalizeDateOnly,
-  toKstEndUtc,
-  toKstStartUtc,
+    buildCalendarRange,
+    formatShortDate,
+    normalizeDateOnly,
+    toKstEndUtc,
+    toKstStartUtc,
 } from './lib/admin-utils';
 
 const contactMethodOptions = ['카톡', '숨고', '기타'];
@@ -260,7 +260,7 @@ export default function AdminScreen() {
         return data;
       } catch (error: any) {
         const message = error?.response?.data?.message || error?.message || '알 수 없는 오류';
-        Alert.alert('오류', `케어 목록을 불러올 수 없습니다.\n${message}`);
+        Alert.alert('오류', `돌봄 목록을 불러올 수 없습니다.\n${message}`);
         console.error('loadCares error:', error?.response?.data || error);
         return [];
       } finally {
@@ -894,7 +894,7 @@ export default function AdminScreen() {
       await refreshCares();
       setShowCareEditModal(false);
     } catch (error) {
-      Alert.alert('오류', '케어 수정에 실패했습니다.');
+      Alert.alert('오류', '돌봄 수정에 실패했습니다.');
     } finally {
       setIsUpdatingCare(false);
     }
@@ -903,7 +903,7 @@ export default function AdminScreen() {
   const handleDeleteCare = useCallback(
     (care: SittingCare) => {
       if (!accessToken) return;
-      Alert.alert('케어 삭제', '정말로 이 케어 기록을 삭제하시겠습니까?', [
+      Alert.alert('돌봄 삭제', '정말로 이 돌봄 기록을 삭제하시겠습니까?', [
         { text: '취소', style: 'cancel' },
         {
           text: '삭제',
@@ -1214,7 +1214,7 @@ export default function AdminScreen() {
 
       <DateTimePickerModal
         visible={showCareDatePicker}
-        title="케어 날짜"
+        title="돌봄 날짜"
         value={editCareDate}
         mode="date"
         onChange={handleCareDateChange}
@@ -1225,7 +1225,7 @@ export default function AdminScreen() {
 
       <DateTimePickerModal
         visible={showCareTimePicker}
-        title="케어 시간"
+        title="돌봄 시간"
         value={editCareDate}
         mode="time"
         onChange={handleCareTimeChange}

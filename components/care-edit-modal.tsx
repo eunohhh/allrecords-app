@@ -1,15 +1,15 @@
 import React from 'react';
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from 'react-native';
 
 import { styles } from './add-care-modal.styles';
@@ -71,7 +71,7 @@ export function CareEditModal({
             ]}
           >
             <View style={styles.header}>
-              <Text style={[styles.title, { color: theme.text }]}>케어 수정</Text>
+              <Text style={[styles.title, { color: theme.text }]}>돌봄 수정</Text>
               <Pressable onPress={onClose}>
                 <Text style={[styles.closeButton, { color: theme.tint }]}>취소</Text>
               </Pressable>
@@ -84,7 +84,7 @@ export function CareEditModal({
               keyboardShouldPersistTaps="handled"
             >
               <View style={styles.field}>
-                <Text style={[styles.label, { color: theme.icon }]}>케어 날짜</Text>
+                <Text style={[styles.label, { color: theme.icon }]}>돌봄 날짜</Text>
                 <Pressable
                   style={[
                     styles.selectButton,
@@ -102,7 +102,7 @@ export function CareEditModal({
               </View>
 
               <View style={styles.field}>
-                <Text style={[styles.label, { color: theme.icon }]}>케어 시간</Text>
+                <Text style={[styles.label, { color: theme.icon }]}>돌봄 시간</Text>
                 <Pressable
                   style={[
                     styles.selectButton,
@@ -152,7 +152,7 @@ export function CareEditModal({
               {isSaving ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
-                <Text style={styles.saveButtonText}>케어 저장</Text>
+                <Text style={styles.saveButtonText}>돌봄 저장</Text>
               )}
             </Pressable>
           </View>

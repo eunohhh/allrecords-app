@@ -20,7 +20,7 @@ export default function CatSittingLayout() {
       <Stack.Screen
         name="care/[id]"
         options={{
-          title: '케어 상세',
+          title: '돌봄 상세',
           header: ({ options }) => (
             <CustomHeader title={options.title ?? ''} showCloseButton />
           ),

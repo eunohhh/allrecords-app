@@ -11,12 +11,12 @@ import {
   View,
 } from 'react-native';
 
+import { styles } from '@/components/add-care-modal.styles';
+import { DateTimePickerModal } from '@/components/date-time-picker-modal';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useSitting } from '@/providers/sitting-provider';
-import { DateTimePickerModal } from '@/components/date-time-picker-modal';
-import { styles } from '@/components/add-care-modal.styles';
 import type { SittingBooking } from '@/lib/sitting-api';
+import { useSitting } from '@/providers/sitting-provider';
 
 type Props = {
   visible: boolean;
@@ -79,10 +79,10 @@ export function BulkCareCreateModal({ visible, onClose, booking }: Props) {
         careTimeKst,
       });
       handleClose();
-      Alert.alert('완료', `${created.length}건의 케어가 등록되었습니다.`);
+      Alert.alert('완료', `${created.length}건의 돌봄이 등록되었습니다.`);
     } catch (error: any) {
       const message = error?.response?.data?.message || error?.message || '알 수 없는 오류';
-      Alert.alert('오류', `케어 일괄 등록에 실패했습니다.\n${message}`);
+      Alert.alert('오류', `돌봄 일괄 등록에 실패했습니다.\n${message}`);
     } finally {
       setIsSaving(false);
     }
@@ -145,7 +145,7 @@ export function BulkCareCreateModal({ visible, onClose, booking }: Props) {
             <Pressable onPress={(e) => e.stopPropagation()}>
               {/* 헤더 */}
               <View style={styles.header}>
-                <Text style={[styles.title, { color: theme.text }]}>케어 한번에 등록</Text>
+                <Text style={[styles.title, { color: theme.text }]}>돌봄 한번에 등록</Text>
                 <Pressable onPress={handleClose}>
                   <Text style={[styles.closeButton, { color: theme.tint }]}>취소</Text>
                 </Pressable>
@@ -215,9 +215,9 @@ export function BulkCareCreateModal({ visible, onClose, booking }: Props) {
                   </Pressable>
                 </View>
 
-                {/* 케어 시간 */}
+                {/* 돌봄 시간 */}
                 <View style={styles.field}>
-                  <Text style={[styles.label, { color: theme.icon }]}>케어 시간</Text>
+                  <Text style={[styles.label, { color: theme.icon }]}>돌봄 시간</Text>
                   <Pressable
                     style={[
                       styles.selectButton,
@@ -281,7 +281,7 @@ export function BulkCareCreateModal({ visible, onClose, booking }: Props) {
 
         <DateTimePickerModal
           visible={showTimePicker}
-          title="케어 시간 선택"
+          title="돌봄 시간 선택"
           value={careTime}
           mode="time"
           onChange={handleTimeChange}

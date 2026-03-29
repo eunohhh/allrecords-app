@@ -1,14 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  View,
+    ActivityIndicator,
+    Alert,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    View,
 } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -17,9 +17,9 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
 import {
-  getNotificationSettings,
-  updateNotificationSettings,
-  type NotificationSettings,
+    getNotificationSettings,
+    updateNotificationSettings,
+    type NotificationSettings,
 } from '@/lib/notification-api';
 import { useAuth } from '@/providers/auth-provider';
 
@@ -101,7 +101,7 @@ export default function NotificationsSettingsScreen() {
     if (Platform.OS === 'ios') {
       Alert.alert(
         '사전 알림 시간',
-        '케어 몇 분 전에 알림을 받을지 선택하세요',
+        '돌봄 몇 분 전에 알림을 받을지 선택하세요',
         [
           ...MINUTE_OPTIONS.map((m) => ({
             text: `${m}분 전`,
@@ -185,7 +185,7 @@ export default function NotificationsSettingsScreen() {
                 <View style={styles.settingInfo}>
                   <ThemedText>알림 시간</ThemedText>
                   <ThemedText style={[styles.settingDesc, { color: theme.icon }]}>
-                    오늘의 케어 일정을 알려드립니다
+                    오늘의 돌봄 일정을 알려드립니다
                   </ThemedText>
                 </View>
                 <View style={styles.settingValue}>
@@ -199,7 +199,7 @@ export default function NotificationsSettingsScreen() {
 
             <View style={[styles.section, { borderColor: theme.icon, opacity: settings.enabled ? 1 : 0.5 }]}>
               <View style={styles.sectionHeader}>
-                <ThemedText type="defaultSemiBold">케어 사전 알림</ThemedText>
+                <ThemedText type="defaultSemiBold">돌봄 사전 알림</ThemedText>
               </View>
 
               <Pressable
@@ -210,7 +210,7 @@ export default function NotificationsSettingsScreen() {
                 <View style={styles.settingInfo}>
                   <ThemedText>사전 알림</ThemedText>
                   <ThemedText style={[styles.settingDesc, { color: theme.icon }]}>
-                    케어 시작 전 미리 알림을 받습니다
+                    돌봄 시작 전 미리 알림을 받습니다
                   </ThemedText>
                 </View>
                 <View style={styles.settingValue}>
