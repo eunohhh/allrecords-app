@@ -760,6 +760,31 @@ export default function AdminScreen() {
     refreshBookings,
   ]);
 
+  const handleCompleteBooking = useCallback(
+    (booking: SittingBooking) => {
+      if (!accessToken) return;
+      Alert.alert(
+        '예약 완료',
+        `${booking.client?.clientName ?? '고객'} · ${booking.catName} 예약을 완료 처리하시겠습니까?`,
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '완료',
+            onPress: async () => {
+              try {
+                await updateBookingStatus(accessToken, booking.id, 'COMPLETED');
+                await refreshBookings();
+              } catch (error) {
+                Alert.alert('오류', '예약 완료 처리에 실패했습니다.');
+              }
+            },
+          },
+        ],
+      );
+    },
+    [accessToken, refreshBookings],
+  );
+
   const handleCancelBooking = useCallback(
     (booking: SittingBooking) => {
       if (!accessToken) return;
@@ -993,6 +1018,7 @@ export default function AdminScreen() {
             onOpenClientPicker={handleOpenBookingFilterClientPicker}
             onClearBookingClientFilter={handleClearBookingClientFilter}
             onEditBooking={handleOpenBookingEdit}
+            onCompleteBooking={handleCompleteBooking}
             onCancelBooking={handleCancelBooking}
             onOpenBookingCreate={handleOpenBookingCreate}
             formatCareTime={formatCareTime}

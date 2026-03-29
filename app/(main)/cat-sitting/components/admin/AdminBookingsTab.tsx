@@ -33,6 +33,7 @@ type AdminBookingsTabProps = {
   onOpenClientPicker: () => void;
   onClearBookingClientFilter: () => void;
   onEditBooking: (booking: SittingBooking) => void;
+  onCompleteBooking: (booking: SittingBooking) => void;
   onCancelBooking: (booking: SittingBooking) => void;
   onOpenBookingCreate: () => void;
   formatCareTime: (value: string) => string;
@@ -53,6 +54,7 @@ export default function AdminBookingsTab({
   onOpenClientPicker,
   onClearBookingClientFilter,
   onEditBooking,
+  onCompleteBooking,
   onCancelBooking,
   onOpenBookingCreate,
   formatCareTime,
@@ -163,6 +165,11 @@ export default function AdminBookingsTab({
                     <Pressable onPress={() => onEditBooking(booking)}>
                       <Text style={[styles.actionText, { color: theme.tint }]}>수정</Text>
                     </Pressable>
+                    {booking.bookingStatus === 'CONFIRMED' && (
+                      <Pressable onPress={() => onCompleteBooking(booking)}>
+                        <Text style={[styles.actionText, { color: '#34C759' }]}>완료</Text>
+                      </Pressable>
+                    )}
                     <Pressable onPress={() => onCancelBooking(booking)}>
                       <Text style={[styles.actionText, { color: '#EF4444' }]}>삭제</Text>
                     </Pressable>

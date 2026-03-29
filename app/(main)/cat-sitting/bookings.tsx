@@ -25,6 +25,7 @@ import {
   createClient,
   getBookings,
   getClients,
+  updateBookingStatus,
   type SittingBooking,
   type SittingClient,
 } from '@/lib/sitting-api';
@@ -338,6 +339,30 @@ export default function BookingListScreen() {
     }
   };
 
+  const handleCompleteBooking = useCallback(
+    (booking: SittingBooking) => {
+      Alert.alert(
+        '예약 완료',
+        `${booking.client?.clientName ?? '고객'} · ${booking.catName} 예약을 완료 처리하시겠습니까?`,
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '완료',
+            onPress: async () => {
+              try {
+                await updateBookingStatus(accessToken!, booking.id, 'COMPLETED');
+                await loadBookings();
+              } catch (error) {
+                Alert.alert('오류', '예약 완료 처리에 실패했습니다.');
+              }
+            },
+          },
+        ],
+      );
+    },
+    [accessToken, loadBookings],
+  );
+
   const handleOpenDrawer = useCallback(() => {
     const drawer = navigation as { openDrawer?: () => void };
     drawer.openDrawer?.();
@@ -426,23 +451,41 @@ export default function BookingListScreen() {
                   <Text style={[pageStyles.cardSub, { color: theme.icon }]}>
                     {formatReservationTime(booking.reservationDate)}
                   </Text>
-                  <Pressable
-                    style={[
-                      pageStyles.bulkCareButton,
-                      {
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : theme.tint + '15',
-                        borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.tint + '40',
-                      },
-                    ]}
-                    onPress={() => {
-                      setSelectedBookingForBulk(booking);
-                      setShowBulkCareModal(true);
-                    }}
-                  >
-                    <Text style={[pageStyles.bulkCareButtonText, { color: theme.tint }]}>
-                      케어 한번에 등록
-                    </Text>
-                  </Pressable>
+                  <View style={pageStyles.cardButtonRow}>
+                    <Pressable
+                      style={[
+                        pageStyles.bulkCareButton,
+                        {
+                          flex: 1,
+                          backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : theme.tint + '15',
+                          borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.tint + '40',
+                        },
+                      ]}
+                      onPress={() => {
+                        setSelectedBookingForBulk(booking);
+                        setShowBulkCareModal(true);
+                      }}
+                    >
+                      <Text style={[pageStyles.bulkCareButtonText, { color: theme.tint }]}>
+                        케어 한번에 등록
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        pageStyles.bulkCareButton,
+                        {
+                          flex: 1,
+                          backgroundColor: isDark ? 'rgba(52,199,89,0.15)' : '#34C75915',
+                          borderColor: isDark ? 'rgba(52,199,89,0.4)' : '#34C75940',
+                        },
+                      ]}
+                      onPress={() => handleCompleteBooking(booking)}
+                    >
+                      <Text style={[pageStyles.bulkCareButtonText, { color: '#34C759' }]}>
+                        완료 처리
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
               ))
             )}
@@ -621,8 +664,12 @@ const pageStyles = StyleSheet.create({
     fontSize: 13,
     marginTop: 6,
   },
-  bulkCareButton: {
+  cardButtonRow: {
+    flexDirection: 'row',
+    gap: 8,
     marginTop: 12,
+  },
+  bulkCareButton: {
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
