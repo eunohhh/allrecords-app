@@ -107,3 +107,5 @@ node_modules/*
 *.sql
 
 eas.json
+
+docs/
