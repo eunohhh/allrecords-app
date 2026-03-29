@@ -34,7 +34,7 @@ LocaleConfig.locales['ko'] = {
 };
 LocaleConfig.defaultLocale = 'ko';
 
-const MAX_VISIBLE_CARES = 3;
+const MAX_VISIBLE_CARES = 4;
 
 // 연도 범위
 const START_YEAR = 2024;
@@ -83,20 +83,21 @@ export default function CatSittingScreen() {
     return localDate.replace(/\. /g, '-').replace('.', '');
   }, []);
 
-  // 날짜별로 care 그룹핑
+  // 날짜별로 care 그룹핑 (완료 케어 제외)
   const caresByDate = React.useMemo(() => {
     const grouped: Record<string, SittingCare[]> = {};
     for (const care of cares) {
+      if (care.completedAt) continue;
       const dateKey = formatDateKey(care.careTime);
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
       grouped[dateKey].push(care);
     }
-    // 각 날짜별로 시간순 정렬
+    // 각 날짜별로 예약 날짜 desc 정렬
     for (const key of Object.keys(grouped)) {
       grouped[key].sort(
-        (a, b) => new Date(a.careTime).getTime() - new Date(b.careTime).getTime(),
+        (a, b) => new Date(b.careTime).getTime() - new Date(a.careTime).getTime(),
       );
     }
     return grouped;
@@ -261,18 +262,16 @@ export default function CatSittingScreen() {
           </Text>
           <View style={styles.caresPreview}>
             {dayCares.slice(0, MAX_VISIBLE_CARES).map((care) => (
-              <View
+              <Text
                 key={care.id}
-                style={[
-                  styles.careDot,
-                  { backgroundColor: care.completedAt ? '#9CA3AF' : '#38BDF8' },
-                ]}
-              />
+                style={[styles.careName, { color: '#38BDF8' }]}
+                numberOfLines={1}
+              >
+                {care.booking?.catName ?? ''}
+              </Text>
             ))}
             {dayCares.length > MAX_VISIBLE_CARES && (
-              <Text style={[styles.moreText, { color: theme.icon }]}>
-                +{dayCares.length - MAX_VISIBLE_CARES}
-              </Text>
+              <Text style={[styles.moreText, { color: theme.icon }]}>...</Text>
             )}
           </View>
         </Pressable>
@@ -616,28 +615,27 @@ const styles = StyleSheet.create({
   },
   dayContainer: {
     width: 44,
-    height: 72,
+    height: 90,
     alignItems: 'center',
-    paddingTop: 6,
+    paddingTop: 4,
     borderRadius: 8,
   },
   dayText: {
     fontSize: 16,
   },
   caresPreview: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 2,
-    gap: 2,
+    width: '100%',
   },
-  careDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+  careName: {
+    fontSize: 9,
+    lineHeight: 12,
+    textAlign: 'center',
   },
   moreText: {
-    fontSize: 8,
+    fontSize: 9,
+    lineHeight: 12,
   },
   modalOverlay: {
     flex: 1,
