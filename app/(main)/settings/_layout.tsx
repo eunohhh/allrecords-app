@@ -28,6 +28,15 @@ export default function SettingsLayout() {
         }}
       />
       <Stack.Screen
+        name="calendar"
+        options={{
+          title: 'Google 캘린더 연동',
+          header: ({ options }) => (
+            <CustomHeader title={options.title ?? ''} showDrawerToggle showCloseButton />
+          ),
+        }}
+      />
+      <Stack.Screen
         name="privacy-policy"
         options={{
           title: '개인정보 처리방침',

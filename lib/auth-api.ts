@@ -114,6 +114,17 @@ export const deleteMe = async (token: string): Promise<{ ok: true }> => {
   }
 };
 
+export const fetchCalendarStatus = async (token: string): Promise<{ linked: boolean }> => {
+  try {
+    const response = await api.get('/auth/app/calendar-status', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data as { linked: boolean };
+  } catch (error) {
+    throw normalizeApiError(error);
+  }
+};
+
 export const formatApiError = (error: unknown): string => {
   const apiError = normalizeApiError(error);
   if (apiError.code) {

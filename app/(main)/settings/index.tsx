@@ -51,6 +51,11 @@ export default function SettingsScreen() {
           onPress={() => router.push('/settings/notifications' as Href)}
         />
         <SettingsItem
+          icon="calendar-outline"
+          title="Google 캘린더 연동"
+          onPress={() => router.push('/settings/calendar' as Href)}
+        />
+        <SettingsItem
           icon="document-text-outline"
           title="개인정보 처리방침"
           onPress={() => router.push('/settings/privacy-policy' as Href)}
