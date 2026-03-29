@@ -83,22 +83,23 @@ export default function CatSittingScreen() {
     return localDate.replace(/\. /g, '-').replace('.', '');
   }, []);
 
-  // 날짜별로 care 그룹핑 (완료 케어 제외)
+  // 날짜별로 care 그룹핑 (미완료 먼저, 완료 아래)
   const caresByDate = React.useMemo(() => {
     const grouped: Record<string, SittingCare[]> = {};
     for (const care of cares) {
-      if (care.completedAt) continue;
       const dateKey = formatDateKey(care.careTime);
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
       grouped[dateKey].push(care);
     }
-    // 각 날짜별로 예약 날짜 desc 정렬
+    // 미완료 먼저 (desc), 완료 뒤 (desc)
     for (const key of Object.keys(grouped)) {
-      grouped[key].sort(
-        (a, b) => new Date(b.careTime).getTime() - new Date(a.careTime).getTime(),
-      );
+      grouped[key].sort((a, b) => {
+        if (!a.completedAt && b.completedAt) return -1;
+        if (a.completedAt && !b.completedAt) return 1;
+        return new Date(b.careTime).getTime() - new Date(a.careTime).getTime();
+      });
     }
     return grouped;
   }, [cares, formatDateKey]);
@@ -264,7 +265,7 @@ export default function CatSittingScreen() {
             {dayCares.slice(0, MAX_VISIBLE_CARES).map((care) => (
               <Text
                 key={care.id}
-                style={[styles.careName, { color: '#38BDF8' }]}
+                style={[styles.careName, { color: care.completedAt ? '#9CA3AF' : '#38BDF8' }]}
                 numberOfLines={1}
               >
                 {care.booking?.catName ?? ''}
@@ -614,7 +615,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   dayContainer: {
-    width: 44,
+    width: 50,
     height: 90,
     alignItems: 'center',
     paddingTop: 4,
@@ -627,10 +628,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 2,
     width: '100%',
+    paddingHorizontal: 1,
   },
   careName: {
-    fontSize: 9,
-    lineHeight: 12,
+    fontSize: 8,
+    lineHeight: 11,
     textAlign: 'center',
   },
   moreText: {
