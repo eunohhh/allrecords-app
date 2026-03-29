@@ -314,11 +314,35 @@ export default function CatSittingScreen() {
         style={styles.calendar}
       />
 
-      {user?.role === 'admin' && (
-        <View style={styles.adminButtonRow}>
+      <View style={styles.actionButtonRow}>
+        <Pressable
+          style={[
+            styles.actionButton,
+            {
+              backgroundColor: isDark ? '#1F2937' : '#FFFFFF',
+              borderColor: isDark ? '#374151' : '#E5E7EB',
+            },
+          ]}
+          onPress={() => router.push('/cat-sitting/bookings')}
+        >
+          <Text style={[styles.actionButtonText, { color: theme.text }]}>예약</Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.actionButton,
+            {
+              backgroundColor: isDark ? '#1F2937' : '#FFFFFF',
+              borderColor: isDark ? '#374151' : '#E5E7EB',
+            },
+          ]}
+          onPress={() => setAddCareModalVisible(true)}
+        >
+          <Text style={[styles.actionButtonText, { color: theme.text }]}>돌봄</Text>
+        </Pressable>
+        {user?.role === 'admin' && (
           <Pressable
             style={[
-              styles.adminButton,
+              styles.actionButton,
               {
                 backgroundColor: isDark ? '#1F2937' : '#FFFFFF',
                 borderColor: isDark ? '#374151' : '#E5E7EB',
@@ -326,10 +350,10 @@ export default function CatSittingScreen() {
             ]}
             onPress={() => router.push('/cat-sitting/admin')}
           >
-            <Text style={[styles.adminButtonText, { color: theme.text }]}>관리자</Text>
+            <Text style={[styles.actionButtonText, { color: theme.text }]}>관리</Text>
           </Pressable>
-        </View>
-      )}
+        )}
+      </View>
 
       {/* 일별 상세 모달 */}
       <Modal
@@ -557,13 +581,6 @@ export default function CatSittingScreen() {
         onClose={() => setAddCareModalVisible(false)}
       />
 
-      {/* 플로팅 액션 버튼 */}
-      <Pressable
-        style={[styles.fab, { backgroundColor: theme.tint }]}
-        onPress={() => setAddCareModalVisible(true)}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </Pressable>
     </View>
   );
 }
@@ -580,17 +597,20 @@ const styles = StyleSheet.create({
   calendar: {
     paddingBottom: 10,
   },
-  adminButtonRow: {
+  actionButtonRow: {
+    flexDirection: 'row',
+    gap: 8,
     paddingHorizontal: 16,
     paddingBottom: 8,
   },
-  adminButton: {
+  actionButton: {
+    flex: 1,
     borderWidth: 1,
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
   },
-  adminButtonText: {
+  actionButtonText: {
     fontSize: 16,
     fontWeight: '600',
   },
@@ -747,26 +767,5 @@ const styles = StyleSheet.create({
   todayButtonText: {
     fontSize: 16,
     fontWeight: '500',
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 30,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  fabText: {
-    color: '#FFFFFF',
-    fontSize: 28,
-    fontWeight: '300',
-    marginTop: -2,
   },
 });
