@@ -7,9 +7,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { Calendar, type DateData, LocaleConfig } from 'react-native-calendars';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AddCareModal } from '@/components/add-care-modal';
 import { Colors } from '@/constants/theme';
@@ -41,6 +43,12 @@ const START_YEAR = 2024;
 const FUTURE_YEARS = 5;
 const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
+// 캘린더 셀을 제외한 고정 영역 합계 (CustomHeader + 월 헤더 + 요일 행 + 액션 버튼 + 여유)
+const CALENDAR_CHROME_HEIGHT = 112 + 70 + 30 + 10 + 60 + 16;
+const MIN_DAY_HEIGHT = 64;
+const MAX_DAY_HEIGHT = 100;
+const CALENDAR_ROWS = 6;
+
 export default function CatSittingScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
@@ -50,6 +58,18 @@ export default function CatSittingScreen() {
 
   const { cares, isLoading, fetchCaresForMonth, toggleComplete, selectedMonth, setSelectedMonth } =
     useSitting();
+
+  const { height: windowHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const dayHeight = Math.min(
+    MAX_DAY_HEIGHT,
+    Math.max(
+      MIN_DAY_HEIGHT,
+      Math.floor(
+        (windowHeight - insets.top - insets.bottom - CALENDAR_CHROME_HEIGHT) / CALENDAR_ROWS,
+      ),
+    ),
+  );
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -249,6 +269,7 @@ export default function CatSittingScreen() {
           onPress={() => handleDayPress({ dateString: date.dateString })}
           style={[
             styles.dayContainer,
+            { height: dayHeight },
             isToday && { backgroundColor: theme.tint + '20' },
           ]}
         >
@@ -278,7 +299,7 @@ export default function CatSittingScreen() {
         </Pressable>
       );
     },
-    [caresByDate, handleDayPress, theme],
+    [caresByDate, handleDayPress, theme, dayHeight],
   );
 
   if (isLoading && cares.length === 0) {
@@ -616,7 +637,6 @@ const styles = StyleSheet.create({
   },
   dayContainer: {
     width: 50,
-    height: 90,
     alignItems: 'center',
     paddingTop: 4,
     borderRadius: 8,
