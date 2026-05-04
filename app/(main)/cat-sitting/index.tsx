@@ -75,6 +75,7 @@ export default function CatSittingScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [yearMonthPickerVisible, setYearMonthPickerVisible] = useState(false);
   const [addCareModalVisible, setAddCareModalVisible] = useState(false);
+  const [addCareInitialDate, setAddCareInitialDate] = useState<Date | undefined>(undefined);
 
   // 연도 목록 생성
   const years = useMemo(() => {
@@ -140,16 +141,14 @@ export default function CatSittingScreen() {
   const handleDayPress = useCallback(
     (day: { dateString: string }) => {
       const dayCares = caresByDate[day.dateString] || [];
-      if (dayCares.length === 0) return;
-
-      if (dayCares.length > MAX_VISIBLE_CARES) {
-        setSelectedDate(day.dateString);
-        setModalVisible(true);
-      } else {
-        // 3개 이하면 첫번째 care로 바로 이동
-        setSelectedDate(day.dateString);
-        setModalVisible(true);
+      if (dayCares.length === 0) {
+        const [y, m, d] = day.dateString.split('-').map(Number);
+        setAddCareInitialDate(new Date(y, m - 1, d, 12, 0, 0));
+        setAddCareModalVisible(true);
+        return;
       }
+      setSelectedDate(day.dateString);
+      setModalVisible(true);
     },
     [caresByDate],
   );
@@ -599,7 +598,11 @@ export default function CatSittingScreen() {
       {/* 돌봄 추가 모달 */}
       <AddCareModal
         visible={addCareModalVisible}
-        onClose={() => setAddCareModalVisible(false)}
+        onClose={() => {
+          setAddCareModalVisible(false);
+          setAddCareInitialDate(undefined);
+        }}
+        initialDate={addCareInitialDate}
       />
 
     </View>
