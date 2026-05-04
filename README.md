@@ -42,6 +42,94 @@ To learn more about developing your project with Expo, look at the following res
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
+## EAS build and submit
+
+This project already has EAS profiles configured in `eas.json`.
+
+- `development`: development client build for local testing
+- `preview`: internal distribution build
+- `preview-testflight`: store-style iOS build for TestFlight upload
+- `production`: production build
+
+Before the first release, make sure you are logged in to Expo and that App Store Connect / Google Play credentials are configured.
+
+```bash
+eas login
+```
+
+### 1. Update version
+
+Before creating a release build, update the app version in `app.json`.
+
+```json
+{
+  "expo": {
+    "version": "1.0.8"
+  }
+}
+```
+
+If you also manage native build numbers, update those values as part of the release process.
+
+### 2. Create a build
+
+For a development client:
+
+```bash
+eas build --profile development --platform ios
+```
+
+For an internal preview build:
+
+```bash
+eas build --profile preview --platform ios
+```
+
+For a TestFlight-ready iOS build:
+
+```bash
+eas build --profile preview-testflight --platform ios
+```
+
+For a production build:
+
+```bash
+eas build --profile production --platform ios
+```
+
+If you need Android instead, replace `ios` with `android`.
+
+### 3. Submit the build
+
+After the build succeeds, submit it with EAS:
+
+```bash
+eas submit --profile production --platform ios
+```
+
+You can also submit Android builds the same way:
+
+```bash
+eas submit --profile production --platform android
+```
+
+### 4. Recommended release flow
+
+1. Update `app.json` version.
+2. Commit release-related changes.
+3. Run a store-ready build with `preview-testflight` or `production`.
+4. Verify the uploaded build in App Store Connect or Google Play Console.
+5. Run `eas submit` if you want Expo to handle the upload step.
+6. Complete release notes, review, and rollout in the store console.
+
+### Useful commands
+
+```bash
+eas build:list
+eas submit --latest --platform ios
+eas credentials
+```
+
 ## Join the community
 
 Join our community of developers creating universal apps.
