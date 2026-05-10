@@ -55,6 +55,8 @@ export type SittingCare = {
       clientName: string;
       catName: string;
       address: string;
+      entryNote: string | null;
+      requirements: string | null;
     };
   };
 };

@@ -186,6 +186,26 @@ export default function CareDetailScreen() {
         </Text>
       </View>
 
+      {/* 출입 메모 */}
+      {care.booking?.client?.entryNote && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: theme.icon }]}>출입 메모</Text>
+          <Text style={[styles.sectionValue, { color: theme.text }]}>
+            {care.booking.client.entryNote}
+          </Text>
+        </View>
+      )}
+
+      {/* 요구사항 */}
+      {care.booking?.client?.requirements && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: theme.icon }]}>요구사항</Text>
+          <Text style={[styles.sectionValue, { color: theme.text }]}>
+            {care.booking.client.requirements}
+          </Text>
+        </View>
+      )}
+
       {/* 메모 */}
       {care.note && (
         <View style={styles.section}>
