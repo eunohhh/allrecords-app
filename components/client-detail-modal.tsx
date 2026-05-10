@@ -82,11 +82,11 @@ export function ClientDetailModal({ visible, onClose, isDark, theme, client }: P
             <DetailRow label="주소" value={client.address} theme={theme} />
             <DetailRow label="출입 메모" value={client.entryNote ?? '-'} theme={theme} />
             <DetailRow label="요구사항" value={client.requirements ?? '-'} theme={theme} />
-            {client.catPic && (
+            {client.coverPhoto && (
               <View style={styles.section}>
-                <Text style={[styles.sectionLabel, { color: theme.icon }]}>고양이 사진</Text>
+                <Text style={[styles.sectionLabel, { color: theme.icon }]}>대표 사진</Text>
                 <Image
-                  source={{ uri: client.catPic }}
+                  source={{ uri: client.coverPhoto.url }}
                   style={styles.catImage}
                   resizeMode="cover"
                 />

@@ -4,6 +4,21 @@ import { getApiBaseUrl } from './auth-api';
 
 // ==================== TYPES ====================
 
+export type SittingPhoto = {
+  id: string;
+  clientId: string;
+  mimeType: string;
+  sizeBytes: number;
+  width: number | null;
+  height: number | null;
+  originalFileName: string | null;
+  memo: string | null;
+  url: string;
+  urlExpiresAt: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type SittingClient = {
   id: string;
   appId: string;
@@ -13,7 +28,7 @@ export type SittingClient = {
   address: string;
   entryNote: string | null;
   requirements: string | null;
-  catPic: string | null;
+  coverPhoto: SittingPhoto | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -78,7 +93,6 @@ export type CreateClientInput = {
   address: string;
   entryNote?: string;
   requirements?: string;
-  catPic?: string;
 };
 
 export type UpdateClientInput = {
@@ -87,7 +101,24 @@ export type UpdateClientInput = {
   address?: string;
   entryNote?: string;
   requirements?: string;
-  catPic?: string;
+  coverPhotoId?: string | null;
+};
+
+export type RequestPhotoUploadUrlInput = {
+  mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
+  sizeBytes: number;
+};
+
+export type RequestPhotoUploadUrlResponse = {
+  photoId: string;
+  key: string;
+  uploadUrl: string;
+  expiresAt: string;
+};
+
+export type ConfirmPhotoInput = {
+  memo?: string;
+  originalFileName?: string;
 };
 
 export type CreateBookingInput = {
@@ -157,11 +188,7 @@ export const updateClient = async (
   clientId: string,
   data: UpdateClientInput,
 ): Promise<SittingClient> => {
-  const response = await api.patch(
-    `/sitting/clients/${clientId}`,
-    data,
-    authHeaders(token),
-  );
+  const response = await api.patch(`/sitting/clients/${clientId}`, data, authHeaders(token));
   return response.data;
 };
 
@@ -194,11 +221,7 @@ export const updateBooking = async (
   bookingId: string,
   data: UpdateBookingInput,
 ): Promise<SittingBooking> => {
-  const response = await api.patch(
-    `/sitting/bookings/${bookingId}`,
-    data,
-    authHeaders(token),
-  );
+  const response = await api.patch(`/sitting/bookings/${bookingId}`, data, authHeaders(token));
   return response.data;
 };
 
@@ -276,4 +299,70 @@ export const toggleCareComplete = async (token: string, careId: string): Promise
     authHeaders(token),
   );
   return response.data;
+};
+
+// ==================== PHOTOS ====================
+
+export const getPhotos = async (token: string, clientId: string): Promise<SittingPhoto[]> => {
+  const response = await api.get(`/sitting/clients/${clientId}/photos`, authHeaders(token));
+  return response.data;
+};
+
+export const requestPhotoUploadUrl = async (
+  token: string,
+  clientId: string,
+  data: RequestPhotoUploadUrlInput,
+): Promise<RequestPhotoUploadUrlResponse> => {
+  const response = await api.post(
+    `/sitting/clients/${clientId}/photos/upload-url`,
+    data,
+    authHeaders(token),
+  );
+  return response.data;
+};
+
+export const confirmPhoto = async (
+  token: string,
+  clientId: string,
+  photoId: string,
+  data: ConfirmPhotoInput = {},
+): Promise<SittingPhoto> => {
+  const response = await api.post(
+    `/sitting/clients/${clientId}/photos/${photoId}/confirm`,
+    data,
+    authHeaders(token),
+  );
+  return response.data;
+};
+
+export const updatePhotoMemo = async (
+  token: string,
+  photoId: string,
+  memo: string | null,
+): Promise<SittingPhoto> => {
+  const response = await api.patch(`/sitting/photos/${photoId}`, { memo }, authHeaders(token));
+  return response.data;
+};
+
+export const deletePhoto = async (token: string, photoId: string): Promise<void> => {
+  await api.delete(`/sitting/photos/${photoId}`, authHeaders(token));
+};
+
+/**
+ * S3에 직접 PUT. signed URL 자체에 서명이 포함되어 있으므로
+ * Authorization 헤더를 절대 첨부하면 안 된다 (axios 인스턴스 우회).
+ */
+export const uploadToS3 = async (
+  uploadUrl: string,
+  mimeType: string,
+  body: Blob | ArrayBuffer | Uint8Array,
+): Promise<void> => {
+  const response = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': mimeType },
+    body: body as BodyInit,
+  });
+  if (!response.ok) {
+    throw new Error(`S3 upload failed: ${response.status} ${response.statusText}`);
+  }
 };
