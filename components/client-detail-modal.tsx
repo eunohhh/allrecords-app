@@ -1,17 +1,12 @@
-import React from 'react';
-import {
-  Image,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, { useState } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { usePhotos } from '@/hooks/use-photos';
 import type { SittingClient } from '@/lib/sitting-api';
 
 import { styles as sharedStyles } from './add-care-modal.styles';
+import { PhotoGrid, sortPhotosCoverFirst } from './photo-grid';
+import { PhotoLightbox } from './photo-lightbox';
 
 type Theme = {
   text: string;
@@ -54,6 +49,12 @@ function DetailRow({ label, value, theme }: DetailRowProps) {
 }
 
 export function ClientDetailModal({ visible, onClose, isDark, theme, client }: Props) {
+  const { photos, coverPhotoId } = usePhotos({
+    clientId: visible ? (client?.id ?? null) : null,
+    knownCoverPhotoId: client?.coverPhoto?.id ?? null,
+  });
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
   if (!client) return null;
 
   return (
@@ -82,21 +83,27 @@ export function ClientDetailModal({ visible, onClose, isDark, theme, client }: P
             <DetailRow label="주소" value={client.address} theme={theme} />
             <DetailRow label="출입 메모" value={client.entryNote ?? '-'} theme={theme} />
             <DetailRow label="요구사항" value={client.requirements ?? '-'} theme={theme} />
-            {client.coverPhoto && (
-              <View style={styles.section}>
-                <Text style={[styles.sectionLabel, { color: theme.icon }]}>대표 사진</Text>
-                <Image
-                  source={{ uri: client.coverPhoto.url }}
-                  style={styles.catImage}
-                  resizeMode="cover"
-                />
-              </View>
-            )}
+            <View style={styles.section}>
+              <Text style={[styles.sectionLabel, { color: theme.icon }]}>사진</Text>
+              <PhotoGrid
+                photos={photos}
+                coverPhotoId={coverPhotoId}
+                onPhotoPress={(index) => setLightboxIndex(index)}
+                cornerBadge="check"
+                isDark={isDark}
+              />
+            </View>
             <DetailRow label="등록일" value={formatDateTime(client.createdAt)} theme={theme} />
             <DetailRow label="수정일" value={formatDateTime(client.updatedAt)} theme={theme} />
           </ScrollView>
         </View>
       </View>
+      <PhotoLightbox
+        visible={lightboxIndex !== null}
+        photos={sortPhotosCoverFirst(photos, coverPhotoId)}
+        initialIndex={lightboxIndex ?? 0}
+        onClose={() => setLightboxIndex(null)}
+      />
     </Modal>
   );
 }
@@ -115,11 +122,5 @@ const styles = StyleSheet.create({
   sectionValue: {
     fontSize: 16,
     lineHeight: 22,
-  },
-  catImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 12,
-    marginTop: 4,
   },
 });

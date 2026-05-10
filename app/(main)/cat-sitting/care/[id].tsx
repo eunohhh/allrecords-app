@@ -11,8 +11,11 @@ import {
     View,
 } from 'react-native';
 
+import { PhotoGrid, sortPhotosCoverFirst } from '@/components/photo-grid';
+import { PhotoLightbox } from '@/components/photo-lightbox';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { usePhotos } from '@/hooks/use-photos';
 import { getCare, type SittingCare } from '@/lib/sitting-api';
 import { useAuth } from '@/providers/auth-provider';
 import { useSitting } from '@/providers/sitting-provider';
@@ -30,6 +33,10 @@ export default function CareDetailScreen() {
   const [care, setCare] = useState<SittingCare | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const clientId = care?.booking?.client?.id ?? null;
+  const { photos, coverPhotoId } = usePhotos({ clientId });
 
   const loadCare = useCallback(async () => {
     if (!accessToken || !id) return;
@@ -224,6 +231,18 @@ export default function CareDetailScreen() {
         </View>
       )}
 
+      {/* 사진 */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionLabel, { color: theme.icon }]}>사진</Text>
+        <PhotoGrid
+          photos={photos}
+          coverPhotoId={coverPhotoId}
+          onPhotoPress={(index) => setLightboxIndex(index)}
+          cornerBadge="star"
+          isDark={isDark}
+        />
+      </View>
+
       {/* 액션 버튼들 */}
       <View style={styles.actions}>
         {care.booking?.client?.address && (
@@ -269,6 +288,12 @@ export default function CareDetailScreen() {
         <ActivityIndicator size="large" color="#FFFFFF" />
       </View>
     )}
+    <PhotoLightbox
+      visible={lightboxIndex !== null}
+      photos={sortPhotosCoverFirst(photos, coverPhotoId)}
+      initialIndex={lightboxIndex ?? 0}
+      onClose={() => setLightboxIndex(null)}
+    />
     </View>
   );
 }
