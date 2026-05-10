@@ -18,16 +18,30 @@ export function sortPhotosCoverFirst(
   return [cover, ...photos.filter((p) => p.id !== coverPhotoId)];
 }
 
+type Mode = 'view' | 'cover-select';
+
 type Props = {
   photos: SittingPhoto[];
   coverPhotoId: string | null;
+  /** view 모드: 사진을 라이트박스로. cover-select 모드: 비활성. */
   onPhotoPress?: (index: number) => void;
   /** cover 사진 우상단 배지. 'star'(돌봄 상세) | 'check'(고객 상세) | undefined(없음) */
   cornerBadge?: 'star' | 'check';
   isDark: boolean;
+  /** 'cover-select'일 때 모든 사진에 체크박스 오버레이. 비-cover 사진 탭 시 onCoverSelect. */
+  mode?: Mode;
+  onCoverSelect?: (photoId: string) => void;
 };
 
-export function PhotoGrid({ photos, coverPhotoId, onPhotoPress, cornerBadge, isDark }: Props) {
+export function PhotoGrid({
+  photos,
+  coverPhotoId,
+  onPhotoPress,
+  cornerBadge,
+  isDark,
+  mode = 'view',
+  onCoverSelect,
+}: Props) {
   const sortedPhotos = useMemo(
     () => sortPhotosCoverFirst(photos, coverPhotoId),
     [photos, coverPhotoId],
@@ -47,21 +61,38 @@ export function PhotoGrid({ photos, coverPhotoId, onPhotoPress, cornerBadge, isD
     <View style={styles.grid}>
       {sortedPhotos.map((photo, index) => {
         const isCover = photo.id === coverPhotoId;
+        const handlePress = () => {
+          if (mode === 'cover-select') {
+            if (!isCover) onCoverSelect?.(photo.id);
+          } else {
+            onPhotoPress?.(index);
+          }
+        };
         return (
-          <Pressable
-            key={photo.id}
-            style={styles.cell}
-            onPress={() => onPhotoPress?.(index)}
-          >
+          <Pressable key={photo.id} style={styles.cell} onPress={handlePress}>
             <Image
               source={{ uri: photo.url }}
               style={styles.image}
               contentFit="cover"
               transition={150}
             />
-            {cornerBadge && isCover && (
+
+            {/* view 모드: cover에만 배지 */}
+            {mode === 'view' && cornerBadge && isCover && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{cornerBadge === 'star' ? '★' : '✓'}</Text>
+              </View>
+            )}
+
+            {/* cover-select 모드: 모든 사진에 체크박스 (cover는 checked) */}
+            {mode === 'cover-select' && (
+              <View
+                style={[
+                  styles.checkbox,
+                  isCover ? styles.checkboxChecked : styles.checkboxUnchecked,
+                ]}
+              >
+                {isCover && <Text style={styles.checkboxMark}>✓</Text>}
               </View>
             )}
           </Pressable>
@@ -105,6 +136,31 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   badgeText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+    lineHeight: 16,
+  },
+  checkbox: {
+    position: 'absolute',
+    top: GAP,
+    right: GAP,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#0284C7',
+    borderColor: '#0284C7',
+  },
+  checkboxUnchecked: {
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderColor: '#FFFFFF',
+  },
+  checkboxMark: {
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '700',

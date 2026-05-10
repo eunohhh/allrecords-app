@@ -1120,6 +1120,10 @@ export default function AdminScreen() {
         isDark={isDark}
         theme={theme}
         client={viewingClient}
+        onClientUpdated={(updated) => {
+          setViewingClient(updated);
+          setClients((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+        }}
       />
 
       <BookingCreateModal
