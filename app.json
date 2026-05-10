@@ -2,7 +2,7 @@
   "expo": {
     "name": "allrecords",
     "slug": "frontend-app",
-    "version": "1.0.9",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "allrecords",
@@ -59,7 +59,9 @@
         {
           "photosPermission": "고객 사진을 등록하기 위해 사진 라이브러리 접근 권한이 필요합니다."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
