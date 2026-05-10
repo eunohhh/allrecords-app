@@ -7,6 +7,7 @@ import type { SittingClient } from '@/lib/sitting-api';
 import { styles as sharedStyles } from './add-care-modal.styles';
 import { PhotoGrid, sortPhotosCoverFirst } from './photo-grid';
 import { PhotoLightbox } from './photo-lightbox';
+import { PhotoUploadModal } from './photo-upload-modal';
 
 type Theme = {
   text: string;
@@ -49,13 +50,21 @@ function DetailRow({ label, value, theme }: DetailRowProps) {
 }
 
 export function ClientDetailModal({ visible, onClose, isDark, theme, client }: Props) {
-  const { photos, coverPhotoId } = usePhotos({
+  const { photos, coverPhotoId, refetch } = usePhotos({
     clientId: visible ? (client?.id ?? null) : null,
     knownCoverPhotoId: client?.coverPhoto?.id ?? null,
   });
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [uploadVisible, setUploadVisible] = useState(false);
 
   if (!client) return null;
+
+  const handleUploadClose = (uploadedCount: number) => {
+    setUploadVisible(false);
+    if (uploadedCount > 0) {
+      void refetch();
+    }
+  };
 
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
@@ -96,6 +105,34 @@ export function ClientDetailModal({ visible, onClose, isDark, theme, client }: P
             <DetailRow label="등록일" value={formatDateTime(client.createdAt)} theme={theme} />
             <DetailRow label="수정일" value={formatDateTime(client.updatedAt)} theme={theme} />
           </ScrollView>
+          <View
+            style={[
+              styles.footer,
+              { borderTopColor: isDark ? '#374151' : '#E5E7EB' },
+            ]}
+          >
+            <Pressable
+              style={[styles.footerButton, { backgroundColor: theme.tint }]}
+              onPress={() => setUploadVisible(true)}
+            >
+              <Text style={styles.footerButtonText}>사진등록</Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.footerButton,
+                styles.footerButtonOutline,
+                { borderColor: theme.tint },
+              ]}
+              onPress={() => {
+                /* 다음 이터레이션에서 wire-up */
+              }}
+              disabled
+            >
+              <Text style={[styles.footerButtonText, { color: theme.icon }]}>
+                대표사진변경
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </View>
       <PhotoLightbox
@@ -103,6 +140,13 @@ export function ClientDetailModal({ visible, onClose, isDark, theme, client }: P
         photos={sortPhotosCoverFirst(photos, coverPhotoId)}
         initialIndex={lightboxIndex ?? 0}
         onClose={() => setLightboxIndex(null)}
+      />
+      <PhotoUploadModal
+        visible={uploadVisible}
+        clientId={client.id}
+        isDark={isDark}
+        theme={theme}
+        onClose={handleUploadClose}
       />
     </Modal>
   );
@@ -122,5 +166,27 @@ const styles = StyleSheet.create({
   sectionValue: {
     fontSize: 16,
     lineHeight: 22,
+  },
+  footer: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingTop: 12,
+    paddingHorizontal: 0,
+    borderTopWidth: 1,
+  },
+  footerButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  footerButtonOutline: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+  },
+  footerButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
