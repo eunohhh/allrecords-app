@@ -17,6 +17,10 @@ const styles = StyleSheet.create({
   headerSide: {
     width: 64,
   },
+  headerSideRight: {
+    width: 64,
+    alignItems: 'flex-end',
+  },
   headerAction: {
     fontSize: 16,
     fontWeight: '600',

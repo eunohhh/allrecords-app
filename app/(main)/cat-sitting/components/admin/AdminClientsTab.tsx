@@ -24,6 +24,7 @@ type AdminClientsTabProps = {
   onChangeClientQuery: (value: string) => void;
   onEditClient: (client: SittingClient) => void;
   onDeleteClient: (client: SittingClient) => void;
+  onViewClientDetail: (client: SittingClient) => void;
   onOpenClientCreate: () => void;
 };
 
@@ -37,6 +38,7 @@ export default function AdminClientsTab({
   onChangeClientQuery,
   onEditClient,
   onDeleteClient,
+  onViewClientDetail,
   onOpenClientCreate,
 }: AdminClientsTabProps)  {
   const openNaverMap = async (address: string) => {
@@ -96,11 +98,6 @@ export default function AdminClientsTab({
                     {client.clientName} · {client.catName}
                   </Text>
                   <Text style={[styles.cardSub, { color: theme.icon }]}>{client.address}</Text>
-                  {!!client.entryNote && (
-                    <Text style={[styles.cardSub, { color: theme.icon }]}>
-                      {client.entryNote}
-                    </Text>
-                  )}
                   <View style={styles.cardActions}>
                     <Pressable onPress={() => onEditClient(client)}>
                       <Text style={[styles.actionText, { color: theme.tint }]}>수정</Text>
@@ -110,6 +107,9 @@ export default function AdminClientsTab({
                     </Pressable>
                     <Pressable onPress={() => openNaverMap(client.address)}>
                       <Text style={[styles.actionText, { color: '#2DB400' }]}>네이버지도</Text>
+                    </Pressable>
+                    <Pressable onPress={() => onViewClientDetail(client)}>
+                      <Text style={[styles.actionText, { color: theme.tint }]}>상세보기</Text>
                     </Pressable>
                   </View>
                 </View>

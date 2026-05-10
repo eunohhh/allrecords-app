@@ -17,7 +17,7 @@ export default function AdminHeader({ theme, onOpenDrawer, onClose }: AdminHeade
         <Text style={[styles.headerAction, { color: theme.tint }]}>메뉴</Text>
       </Pressable>
       <Text style={[styles.title, { color: theme.text }]}>관리자</Text>
-      <Pressable style={styles.headerSide} onPress={onClose}>
+      <Pressable style={styles.headerSideRight} onPress={onClose}>
         <Text style={[styles.headerAction, { color: theme.tint }]}>닫기</Text>
       </Pressable>
     </View>

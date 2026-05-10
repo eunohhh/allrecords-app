@@ -42,6 +42,8 @@ const useAdminClientState = () => {
   const [clientQuery, setClientQuery] = useState('');
   const [clientModalVisible, setClientModalVisible] = useState(false);
   const [editingClient, setEditingClient] = useState<SittingClient | null>(null);
+  const [clientDetailVisible, setClientDetailVisible] = useState(false);
+  const [viewingClient, setViewingClient] = useState<SittingClient | null>(null);
   const [isSavingClient, setIsSavingClient] = useState(false);
   const [clientForm, dispatchClientForm] = useReducer(
     clientFormReducer,
@@ -88,6 +90,10 @@ const useAdminClientState = () => {
     setClientModalVisible,
     editingClient,
     setEditingClient,
+    clientDetailVisible,
+    setClientDetailVisible,
+    viewingClient,
+    setViewingClient,
     clientName: clientForm.clientName,
     setClientName,
     clientCatName: clientForm.clientCatName,

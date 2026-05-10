@@ -7,6 +7,7 @@ import { AddCareModal } from '@/components/add-care-modal';
 import { BookingCreateModal } from '@/components/booking-create-modal';
 import { CareEditModal } from '@/components/care-edit-modal';
 import { ClientCreateModal } from '@/components/client-create-modal';
+import { ClientDetailModal } from '@/components/client-detail-modal';
 import { ClientPickerModal } from '@/components/client-picker-modal';
 import { ContactMethodPickerModal } from '@/components/contact-method-picker-modal';
 import { DateTimePickerModal } from '@/components/date-time-picker-modal';
@@ -20,6 +21,7 @@ import {
     getBookings,
     getCaresForCalendar,
     getClients,
+    toggleCareComplete,
     updateBooking,
     updateBookingStatus,
     updateCare,
@@ -75,6 +77,10 @@ export default function AdminScreen() {
     setClientModalVisible,
     editingClient,
     setEditingClient,
+    clientDetailVisible,
+    setClientDetailVisible,
+    viewingClient,
+    setViewingClient,
     clientName,
     setClientName,
     clientCatName,
@@ -396,6 +402,16 @@ export default function AdminScreen() {
     });
     setClientModalVisible(true);
   }, [hydrateClientForm]);
+
+  const handleViewClientDetail = useCallback((client: SittingClient) => {
+    setViewingClient(client);
+    setClientDetailVisible(true);
+  }, [setViewingClient, setClientDetailVisible]);
+
+  const handleCloseClientDetail = useCallback(() => {
+    setClientDetailVisible(false);
+    setViewingClient(null);
+  }, [setViewingClient, setClientDetailVisible]);
 
   const handleSaveClient = useCallback(async () => {
     if (!accessToken) return;
@@ -918,6 +934,31 @@ export default function AdminScreen() {
     [accessToken, refreshCares],
   );
 
+  const handleCompleteCare = useCallback(
+    (care: SittingCare) => {
+      if (!accessToken) return;
+      Alert.alert(
+        '돌봄 완료',
+        `${care.booking?.client?.clientName ?? '고객'} · ${care.booking?.catName ?? '-'} 돌봄을 완료 처리하시겠습니까?`,
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '완료',
+            onPress: async () => {
+              try {
+                await toggleCareComplete(accessToken, care.id);
+                await refreshCares();
+              } catch (error) {
+                Alert.alert('오류', '돌봄 완료 처리에 실패했습니다.');
+              }
+            },
+          },
+        ],
+      );
+    },
+    [accessToken, refreshCares],
+  );
+
   const handleCareMonthChange = useCallback(
     (direction: 'prev' | 'next') => {
       const offset = direction === 'prev' ? -1 : 1;
@@ -998,6 +1039,7 @@ export default function AdminScreen() {
             onChangeClientQuery={setClientQuery}
             onEditClient={handleOpenClientEdit}
             onDeleteClient={handleDeleteClient}
+            onViewClientDetail={handleViewClientDetail}
             onOpenClientCreate={handleOpenClientCreate}
           />
         )}
@@ -1042,6 +1084,7 @@ export default function AdminScreen() {
             onClearCareFilters={handleClearCareFilters}
             onChangeCareMonth={handleCareMonthChange}
             onEditCare={handleOpenCareEdit}
+            onCompleteCare={handleCompleteCare}
             onDeleteCare={handleDeleteCare}
             onOpenCareCreate={handleOpenCareCreate}
             formatShortDate={formatShortDate}
@@ -1069,6 +1112,14 @@ export default function AdminScreen() {
         onChangeClientRequirements={setClientRequirements}
         isSaving={isSavingClient}
         onSave={handleSaveClient}
+      />
+
+      <ClientDetailModal
+        visible={clientDetailVisible}
+        onClose={handleCloseClientDetail}
+        isDark={isDark}
+        theme={theme}
+        client={viewingClient}
       />
 
       <BookingCreateModal

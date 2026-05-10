@@ -31,6 +31,7 @@ type AdminCaresTabProps = {
   onClearCareFilters: () => void;
   onChangeCareMonth: (direction: 'prev' | 'next') => void;
   onEditCare: (care: SittingCare) => void;
+  onCompleteCare: (care: SittingCare) => void;
   onDeleteCare: (care: SittingCare) => void;
   onOpenCareCreate: () => void;
   formatShortDate: (value: Date) => string;
@@ -53,6 +54,7 @@ export default function AdminCaresTab({
   onClearCareFilters,
   onChangeCareMonth,
   onEditCare,
+  onCompleteCare,
   onDeleteCare,
   onOpenCareCreate,
   formatShortDate,
@@ -161,6 +163,11 @@ export default function AdminCaresTab({
                   <Pressable onPress={() => onEditCare(care)}>
                     <Text style={[styles.actionText, { color: theme.tint }]}>수정</Text>
                   </Pressable>
+                  {!care.completedAt && (
+                    <Pressable onPress={() => onCompleteCare(care)}>
+                      <Text style={[styles.actionText, { color: '#34C759' }]}>완료</Text>
+                    </Pressable>
+                  )}
                   <Pressable onPress={() => onDeleteCare(care)}>
                     <Text style={[styles.actionText, { color: '#EF4444' }]}>삭제</Text>
                   </Pressable>
