@@ -6,6 +6,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   View,
@@ -70,7 +71,8 @@ export function ClientCreateModal({
       transparent
       onRequestClose={onClose}
     >
-      <Pressable style={styles.pickerOverlay} onPress={onClose}>
+      <View style={styles.pickerOverlay}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardAvoid}
@@ -81,134 +83,132 @@ export function ClientCreateModal({
               { backgroundColor: isDark ? '#1F2937' : '#FFFFFF' },
             ]}
           >
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <View style={styles.header}>
-                <Text style={[styles.title, { color: theme.text }]}>{heading}</Text>
-                <Pressable onPress={onClose}>
-                  <Text style={[styles.closeButton, { color: theme.tint }]}>취소</Text>
-                </Pressable>
+            <View style={styles.header}>
+              <Text style={[styles.title, { color: theme.text }]}>{heading}</Text>
+              <Pressable onPress={onClose}>
+                <Text style={[styles.closeButton, { color: theme.tint }]}>취소</Text>
+              </Pressable>
+            </View>
+
+            <ScrollView
+              style={styles.form}
+              showsVerticalScrollIndicator={false}
+              keyboardDismissMode="on-drag"
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.icon }]}>고객 이름</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: isDark ? '#374151' : '#F3F4F6',
+                      borderColor: isDark ? '#4B5563' : '#E5E7EB',
+                      color: theme.text,
+                    },
+                  ]}
+                  value={clientName}
+                  onChangeText={onChangeClientName}
+                  placeholder="고객 이름"
+                  placeholderTextColor={theme.icon}
+                />
               </View>
 
-              <ScrollView
-                style={styles.form}
-                showsVerticalScrollIndicator={false}
-                keyboardDismissMode="on-drag"
-                keyboardShouldPersistTaps="handled"
-              >
-                <View style={styles.field}>
-                  <Text style={[styles.label, { color: theme.icon }]}>고객 이름</Text>
-                  <TextInput
-                    style={[
-                      styles.textInput,
-                      {
-                        backgroundColor: isDark ? '#374151' : '#F3F4F6',
-                        borderColor: isDark ? '#4B5563' : '#E5E7EB',
-                        color: theme.text,
-                      },
-                    ]}
-                    value={clientName}
-                    onChangeText={onChangeClientName}
-                    placeholder="고객 이름"
-                    placeholderTextColor={theme.icon}
-                  />
-                </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.icon }]}>고양이 이름</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: isDark ? '#374151' : '#F3F4F6',
+                      borderColor: isDark ? '#4B5563' : '#E5E7EB',
+                      color: theme.text,
+                    },
+                  ]}
+                  value={clientCatName}
+                  onChangeText={onChangeClientCatName}
+                  placeholder="고양이 이름"
+                  placeholderTextColor={theme.icon}
+                />
+              </View>
 
-                <View style={styles.field}>
-                  <Text style={[styles.label, { color: theme.icon }]}>고양이 이름</Text>
-                  <TextInput
-                    style={[
-                      styles.textInput,
-                      {
-                        backgroundColor: isDark ? '#374151' : '#F3F4F6',
-                        borderColor: isDark ? '#4B5563' : '#E5E7EB',
-                        color: theme.text,
-                      },
-                    ]}
-                    value={clientCatName}
-                    onChangeText={onChangeClientCatName}
-                    placeholder="고양이 이름"
-                    placeholderTextColor={theme.icon}
-                  />
-                </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.icon }]}>주소</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: isDark ? '#374151' : '#F3F4F6',
+                      borderColor: isDark ? '#4B5563' : '#E5E7EB',
+                      color: theme.text,
+                    },
+                  ]}
+                  value={clientAddress}
+                  onChangeText={onChangeClientAddress}
+                  placeholder="주소"
+                  placeholderTextColor={theme.icon}
+                />
+              </View>
 
-                <View style={styles.field}>
-                  <Text style={[styles.label, { color: theme.icon }]}>주소</Text>
-                  <TextInput
-                    style={[
-                      styles.textInput,
-                      {
-                        backgroundColor: isDark ? '#374151' : '#F3F4F6',
-                        borderColor: isDark ? '#4B5563' : '#E5E7EB',
-                        color: theme.text,
-                      },
-                    ]}
-                    value={clientAddress}
-                    onChangeText={onChangeClientAddress}
-                    placeholder="주소"
-                    placeholderTextColor={theme.icon}
-                  />
-                </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.icon }]}>출입 메모 (선택)</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: isDark ? '#374151' : '#F3F4F6',
+                      borderColor: isDark ? '#4B5563' : '#E5E7EB',
+                      color: theme.text,
+                    },
+                  ]}
+                  value={clientEntryNote}
+                  onChangeText={onChangeClientEntryNote}
+                  placeholder="출입 메모"
+                  placeholderTextColor={theme.icon}
+                  multiline
+                  numberOfLines={2}
+                />
+              </View>
 
-                <View style={styles.field}>
-                  <Text style={[styles.label, { color: theme.icon }]}>출입 메모 (선택)</Text>
-                  <TextInput
-                    style={[
-                      styles.textInput,
-                      {
-                        backgroundColor: isDark ? '#374151' : '#F3F4F6',
-                        borderColor: isDark ? '#4B5563' : '#E5E7EB',
-                        color: theme.text,
-                      },
-                    ]}
-                    value={clientEntryNote}
-                    onChangeText={onChangeClientEntryNote}
-                    placeholder="출입 메모"
-                    placeholderTextColor={theme.icon}
-                    multiline
-                    numberOfLines={2}
-                  />
-                </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.icon }]}>요구사항 (선택)</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      backgroundColor: isDark ? '#374151' : '#F3F4F6',
+                      borderColor: isDark ? '#4B5563' : '#E5E7EB',
+                      color: theme.text,
+                    },
+                  ]}
+                  value={clientRequirements}
+                  onChangeText={onChangeClientRequirements}
+                  placeholder="요구사항"
+                  placeholderTextColor={theme.icon}
+                  multiline
+                  numberOfLines={2}
+                />
+              </View>
+            </ScrollView>
 
-                <View style={styles.field}>
-                  <Text style={[styles.label, { color: theme.icon }]}>요구사항 (선택)</Text>
-                  <TextInput
-                    style={[
-                      styles.textInput,
-                      {
-                        backgroundColor: isDark ? '#374151' : '#F3F4F6',
-                        borderColor: isDark ? '#4B5563' : '#E5E7EB',
-                        color: theme.text,
-                      },
-                    ]}
-                    value={clientRequirements}
-                    onChangeText={onChangeClientRequirements}
-                    placeholder="요구사항"
-                    placeholderTextColor={theme.icon}
-                    multiline
-                    numberOfLines={2}
-                  />
-                </View>
-              </ScrollView>
-
-              <Pressable
-                style={[
-                  styles.saveButton,
-                  { backgroundColor: theme.tint },
-                  isSaving && { opacity: 0.6 },
-                ]}
-                onPress={onSave}
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.saveButtonText}>{saveText}</Text>
-                )}
-              </Pressable>
+            <Pressable
+              style={[
+                styles.saveButton,
+                { backgroundColor: theme.tint },
+                isSaving && { opacity: 0.6 },
+              ]}
+              onPress={onSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Text style={styles.saveButtonText}>{saveText}</Text>
+              )}
             </Pressable>
           </View>
         </KeyboardAvoidingView>
-      </Pressable>
+      </View>
     </Modal>
   );
 }

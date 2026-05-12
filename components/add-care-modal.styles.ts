@@ -34,7 +34,6 @@ export const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-    maxHeight: 400,
   },
   field: {
     marginBottom: 20,
