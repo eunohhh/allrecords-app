@@ -100,10 +100,10 @@ export default function AdminClientsTab({
                   <Text style={[styles.cardSub, { color: theme.icon }]}>{client.address}</Text>
                   <View style={styles.cardActions}>
                     <Pressable onPress={() => onEditClient(client)}>
-                      <Text style={[styles.actionText, { color: theme.tint }]}>수정</Text>
+                      <Text style={[styles.actionText, { color: theme.tint }]}>정보수정</Text>
                     </Pressable>
                     <Pressable onPress={() => onDeleteClient(client)}>
-                      <Text style={[styles.actionText, { color: '#EF4444' }]}>삭제</Text>
+                      <Text style={[styles.actionText, { color: '#EF4444' }]}>고객삭제</Text>
                     </Pressable>
                     <Pressable onPress={() => openNaverMap(client.address)}>
                       <Text style={[styles.actionText, { color: '#2DB400' }]}>네이버지도</Text>
