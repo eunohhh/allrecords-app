@@ -516,9 +516,10 @@ export function AddCareModal({ visible, onClose, initialDate }: Props) {
 
             <ScrollView
               style={styles.form}
+              contentContainerStyle={{ paddingBottom: 24 }}
               showsVerticalScrollIndicator={false}
-              keyboardDismissMode="on-drag"
               keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets
             >
               {/* 예약 선택 */}
               <View style={styles.field}>

@@ -79,9 +79,10 @@ export function CareEditModal({
 
             <ScrollView
               style={styles.form}
+              contentContainerStyle={{ paddingBottom: 24 }}
               showsVerticalScrollIndicator={false}
-              keyboardDismissMode="on-drag"
               keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets
             >
               <View style={styles.field}>
                 <Text style={[styles.label, { color: theme.icon }]}>돌봄 날짜</Text>
