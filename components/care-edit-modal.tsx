@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -51,6 +51,10 @@ export function CareEditModal({
   formatDate,
   formatTime,
 }: Props) {
+  const scrollRef = useRef<ScrollView>(null);
+  const handleLastFieldFocus = () => {
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 150);
+  };
   return (
     <Modal
       visible={visible}
@@ -78,6 +82,7 @@ export function CareEditModal({
             </View>
 
             <ScrollView
+              ref={scrollRef}
               style={styles.form}
               contentContainerStyle={{ paddingBottom: 24 }}
               showsVerticalScrollIndicator={false}
@@ -133,6 +138,7 @@ export function CareEditModal({
                   ]}
                   value={note}
                   onChangeText={onChangeNote}
+                  onFocus={handleLastFieldFocus}
                   placeholder="메모"
                   placeholderTextColor={theme.icon}
                   multiline

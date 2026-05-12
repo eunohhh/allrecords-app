@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -87,6 +87,10 @@ export function BookingCreateModal({
   const saveText = saveLabel ?? '예약 저장';
   const canSelectClient = allowClientChange !== false;
   const canCreateClient = showClientCreate !== false;
+  const scrollRef = useRef<ScrollView>(null);
+  const handleLastFieldFocus = () => {
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 150);
+  };
 
   return (
     <>
@@ -116,6 +120,7 @@ export function BookingCreateModal({
               </View>
 
               <ScrollView
+                ref={scrollRef}
                 style={styles.form}
                 contentContainerStyle={{ paddingBottom: 24 }}
                 showsVerticalScrollIndicator={false}
@@ -282,6 +287,7 @@ export function BookingCreateModal({
                         ]}
                         value={entryNote ?? ''}
                         onChangeText={onChangeEntryNote}
+                        onFocus={handleLastFieldFocus}
                         placeholder="메모"
                         placeholderTextColor={theme.icon}
                         multiline

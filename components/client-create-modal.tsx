@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -63,6 +63,10 @@ export function ClientCreateModal({
 }: Props) {
   const heading = title ?? '고객 추가';
   const saveText = saveLabel ?? '고객 저장';
+  const scrollRef = useRef<ScrollView>(null);
+  const handleLastFieldFocus = () => {
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 150);
+  };
 
   return (
     <Modal
@@ -91,6 +95,7 @@ export function ClientCreateModal({
             </View>
 
             <ScrollView
+              ref={scrollRef}
               style={styles.form}
               contentContainerStyle={{ paddingBottom: 24 }}
               showsVerticalScrollIndicator={false}
@@ -184,6 +189,7 @@ export function ClientCreateModal({
                   ]}
                   value={clientRequirements}
                   onChangeText={onChangeClientRequirements}
+                  onFocus={handleLastFieldFocus}
                   placeholder="요구사항"
                   placeholderTextColor={theme.icon}
                   multiline
