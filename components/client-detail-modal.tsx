@@ -135,11 +135,6 @@ export function ClientDetailModal({
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            <DetailRow label="고객 이름" value={client.clientName} theme={theme} />
-            <DetailRow label="고양이 이름" value={client.catName} theme={theme} />
-            <DetailRow label="주소" value={client.address} theme={theme} />
-            <DetailRow label="출입 메모" value={client.entryNote ?? '-'} theme={theme} />
-            <DetailRow label="요구사항" value={client.requirements ?? '-'} theme={theme} />
             <View style={styles.section}>
               <Text style={[styles.sectionLabel, { color: theme.icon }]}>
                 {coverSelectMode ? '사진 — 대표로 지정할 사진을 선택' : '사진'}
@@ -154,6 +149,11 @@ export function ClientDetailModal({
                 onCoverSelect={handleCoverSelect}
               />
             </View>
+            <DetailRow label="고객 이름" value={client.clientName} theme={theme} />
+            <DetailRow label="고양이 이름" value={client.catName} theme={theme} />
+            <DetailRow label="주소" value={client.address} theme={theme} />
+            <DetailRow label="출입 메모" value={client.entryNote ?? '-'} theme={theme} />
+            <DetailRow label="요구사항" value={client.requirements ?? '-'} theme={theme} />
             <DetailRow label="등록일" value={formatDateTime(client.createdAt)} theme={theme} />
             <DetailRow label="수정일" value={formatDateTime(client.updatedAt)} theme={theme} />
           </ScrollView>

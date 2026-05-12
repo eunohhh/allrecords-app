@@ -49,10 +49,16 @@ export function PhotoGrid({
 
   if (sortedPhotos.length === 0) {
     return (
-      <View style={[styles.empty, { backgroundColor: isDark ? '#111827' : '#F3F4F6' }]}>
-        <Text style={[styles.emptyText, { color: isDark ? '#9CA3AF' : '#6B7280' }]}>
-          사진이 없습니다
-        </Text>
+      <View style={styles.grid}>
+        <View style={styles.cell}>
+          <View
+            style={[styles.emptyCell, { backgroundColor: isDark ? '#111827' : '#F3F4F6' }]}
+          >
+            <Text style={[styles.emptyText, { color: isDark ? '#9CA3AF' : '#6B7280' }]}>
+              사진{'\n'}없음
+            </Text>
+          </View>
+        </View>
       </View>
     );
   }
@@ -166,12 +172,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 16,
   },
-  empty: {
-    paddingVertical: 24,
-    borderRadius: 12,
+  emptyCell: {
+    flex: 1,
+    borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
   },
 });
