@@ -807,29 +807,41 @@ type ExpandableTextProps = {
 
 function ExpandableText({ text, style, theme }: ExpandableTextProps) {
   const [expanded, setExpanded] = useState(false);
-  const [isTruncated, setIsTruncated] = useState(false);
+  const [needsTruncate, setNeedsTruncate] = useState(false);
+  const [measured, setMeasured] = useState(false);
   const isEmpty = text === '-';
 
   return (
-    <>
-      <Text
-        style={style}
-        numberOfLines={expanded ? undefined : 1}
-        onTextLayout={(e) => {
-          if (isEmpty || isTruncated) return;
-          if (e.nativeEvent.lines.length > 1) setIsTruncated(true);
-        }}
-      >
+    <View>
+      <Text style={style} numberOfLines={expanded ? undefined : 1}>
         {text}
       </Text>
-      {!isEmpty && isTruncated && (
+
+      {!measured && !isEmpty && (
+        <View
+          pointerEvents="none"
+          style={{ position: 'absolute', left: 0, right: 0, opacity: 0 }}
+        >
+          <Text
+            style={style}
+            onTextLayout={(e) => {
+              setNeedsTruncate(e.nativeEvent.lines.length > 1);
+              setMeasured(true);
+            }}
+          >
+            {text}
+          </Text>
+        </View>
+      )}
+
+      {!isEmpty && measured && needsTruncate && (
         <Pressable onPress={() => setExpanded((v) => !v)} hitSlop={8}>
           <Text style={{ color: theme.icon, fontSize: 13, marginTop: 4 }}>
             {expanded ? '접기' : '더보기'}
           </Text>
         </Pressable>
       )}
-    </>
+    </View>
   );
 }
 
