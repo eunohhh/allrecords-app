@@ -20,6 +20,7 @@ import { ContactMethodPickerModal } from '@/components/contact-method-picker-mod
 import { DateTimePickerModal } from '@/components/date-time-picker-modal';
 import { PhotoGrid, sortPhotosCoverFirst } from '@/components/photo-grid';
 import { PhotoLightbox } from '@/components/photo-lightbox';
+import { PhotoUploadModal } from '@/components/photo-upload-modal';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { usePhotos } from '@/hooks/use-photos';
@@ -86,7 +87,12 @@ export default function CareDetailScreen() {
   const [pendingCareEditOpen, setPendingCareEditOpen] = useState(false);
 
   const clientId = care?.booking?.client?.id ?? null;
-  const { photos, coverPhotoId } = usePhotos({ clientId });
+  const { photos, coverPhotoId, refetch: refetchPhotos } = usePhotos({ clientId });
+
+  // 사진 관리
+  const [uploadVisible, setUploadVisible] = useState(false);
+  const [coverSelectMode, setCoverSelectMode] = useState(false);
+  const [isUpdatingCover, setIsUpdatingCover] = useState(false);
 
   const loadCare = useCallback(
     async (options?: { silent?: boolean }) => {
@@ -330,6 +336,32 @@ export default function CareDetailScreen() {
     }
   }, [accessToken, care, editCareDate, editCareNote, loadCare, fetchCaresForMonth]);
 
+  // 사진등록 / 대표사진변경
+  const handleUploadClose = useCallback(
+    (uploadedCount: number) => {
+      setUploadVisible(false);
+      if (uploadedCount > 0) void refetchPhotos();
+    },
+    [refetchPhotos],
+  );
+
+  const handleCoverSelect = useCallback(
+    async (photoId: string) => {
+      if (!accessToken || !clientId || isUpdatingCover) return;
+      setIsUpdatingCover(true);
+      try {
+        await updateClient(accessToken, clientId, { coverPhotoId: photoId });
+        await refetchPhotos();
+        setCoverSelectMode(false);
+      } catch {
+        Alert.alert('오류', '대표사진 변경에 실패했습니다.');
+      } finally {
+        setIsUpdatingCover(false);
+      }
+    },
+    [accessToken, clientId, isUpdatingCover, refetchPhotos],
+  );
+
   // 픽커 열기/닫기 (부모 모달 재오픈 댄스)
   const handleOpenBookingDatePicker = useCallback(() => {
     setPendingBookingEditOpen(true);
@@ -494,13 +526,17 @@ export default function CareDetailScreen() {
 
       {/* 사진 */}
       <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: theme.icon }]}>사진</Text>
+        <Text style={[styles.sectionLabel, { color: theme.icon }]}>
+          {coverSelectMode ? '사진 — 대표로 지정할 사진을 선택' : '사진'}
+        </Text>
         <PhotoGrid
           photos={photos}
           coverPhotoId={coverPhotoId}
           onPhotoPress={(index) => setLightboxIndex(index)}
           cornerBadge="star"
           isDark={isDark}
+          mode={coverSelectMode ? 'cover-select' : 'view'}
+          onCoverSelect={handleCoverSelect}
         />
       </View>
 
@@ -576,93 +612,143 @@ export default function CareDetailScreen() {
 
       {/* 액션 버튼들 */}
       <View style={styles.actions}>
-        {/* Row 1: 주요 액션 */}
-        <View style={styles.actionsRow}>
-          {care.booking?.client?.address ? (
+        {coverSelectMode ? (
+          <View style={styles.actionsRow}>
             <Pressable
-              style={[styles.actionButton, styles.naverMapButton]}
-              onPress={() => openNaverMap(care.booking!.client!.address)}
+              style={[styles.actionButton, { backgroundColor: theme.tint }]}
+              onPress={() => setCoverSelectMode(false)}
             >
-              <Text numberOfLines={1} style={styles.naverMapButtonText}>
-                네이버 지도
+              <Text numberOfLines={1} style={styles.editButtonText}>
+                완료
               </Text>
             </Pressable>
-          ) : (
-            <View style={[styles.actionButton, { opacity: 0 }]} />
-          )}
+          </View>
+        ) : (
+          <>
+            {/* Row 1: 주요 액션 */}
+            <View style={styles.actionsRow}>
+              {care.booking?.client?.address ? (
+                <Pressable
+                  style={[styles.actionButton, styles.naverMapButton]}
+                  onPress={() => openNaverMap(care.booking!.client!.address)}
+                >
+                  <Text numberOfLines={1} style={styles.naverMapButtonText}>
+                    네이버 지도
+                  </Text>
+                </Pressable>
+              ) : (
+                <View style={[styles.actionButton, { opacity: 0 }]} />
+              )}
 
-          <Pressable
-            style={[
-              styles.actionButton,
-              {
-                backgroundColor: isCompleted ? theme.background : theme.tint,
-                borderColor: theme.tint,
-                borderWidth: isCompleted ? 1 : 0,
-              },
-            ]}
-            onPress={handleToggleComplete}
-          >
-            <Text
-              numberOfLines={1}
-              style={[
-                styles.actionButtonText,
-                { color: isCompleted ? theme.tint : '#FFFFFF' },
-              ]}
-            >
-              {isCompleted ? '완료 취소' : '완료 처리'}
-            </Text>
-          </Pressable>
+              <Pressable
+                style={[
+                  styles.actionButton,
+                  {
+                    backgroundColor: isCompleted ? theme.background : theme.tint,
+                    borderColor: theme.tint,
+                    borderWidth: isCompleted ? 1 : 0,
+                  },
+                ]}
+                onPress={handleToggleComplete}
+              >
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    styles.actionButtonText,
+                    { color: isCompleted ? theme.tint : '#FFFFFF' },
+                  ]}
+                >
+                  {isCompleted ? '완료 취소' : '완료 처리'}
+                </Text>
+              </Pressable>
 
-          <Pressable
-            style={[styles.actionButton, styles.deleteButton]}
-            onPress={handleDelete}
-          >
-            <Text numberOfLines={1} style={styles.deleteButtonText}>
-              삭제
-            </Text>
-          </Pressable>
-        </View>
+              <Pressable
+                style={[styles.actionButton, styles.deleteButton]}
+                onPress={handleDelete}
+              >
+                <Text numberOfLines={1} style={styles.deleteButtonText}>
+                  삭제
+                </Text>
+              </Pressable>
+            </View>
 
-        {/* Row 2: 수정 액션 */}
-        <View style={styles.actionsRow}>
-          <Pressable
-            style={[styles.actionButton, { backgroundColor: theme.tint }]}
-            onPress={handleOpenClientEdit}
-          >
-            <Text numberOfLines={1} style={styles.editButtonText}>
-              고객 수정
-            </Text>
-          </Pressable>
+            {/* Row 2: 수정 액션 */}
+            <View style={styles.actionsRow}>
+              <Pressable
+                style={[styles.actionButton, { backgroundColor: theme.tint }]}
+                onPress={handleOpenClientEdit}
+              >
+                <Text numberOfLines={1} style={styles.editButtonText}>
+                  고객 수정
+                </Text>
+              </Pressable>
 
-          <Pressable
-            style={[
-              styles.actionButton,
-              { backgroundColor: theme.tint, opacity: isFetchingBooking ? 0.6 : 1 },
-            ]}
-            onPress={handleOpenBookingEdit}
-            disabled={isFetchingBooking}
-          >
-            {isFetchingBooking ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <Text numberOfLines={1} style={styles.editButtonText}>
-                예약 수정
-              </Text>
-            )}
-          </Pressable>
+              <Pressable
+                style={[
+                  styles.actionButton,
+                  { backgroundColor: theme.tint, opacity: isFetchingBooking ? 0.6 : 1 },
+                ]}
+                onPress={handleOpenBookingEdit}
+                disabled={isFetchingBooking}
+              >
+                {isFetchingBooking ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text numberOfLines={1} style={styles.editButtonText}>
+                    예약 수정
+                  </Text>
+                )}
+              </Pressable>
 
-          <Pressable
-            style={[styles.actionButton, { backgroundColor: theme.tint }]}
-            onPress={handleOpenCareEdit}
-          >
-            <Text numberOfLines={1} style={styles.editButtonText}>
-              돌봄 수정
-            </Text>
-          </Pressable>
-        </View>
+              <Pressable
+                style={[styles.actionButton, { backgroundColor: theme.tint }]}
+                onPress={handleOpenCareEdit}
+              >
+                <Text numberOfLines={1} style={styles.editButtonText}>
+                  돌봄 수정
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Row 3: 사진 액션 (중앙정렬) */}
+            <View style={styles.photoActionsRow}>
+              <Pressable
+                style={[styles.photoActionButton, { backgroundColor: theme.tint }]}
+                onPress={() => setUploadVisible(true)}
+              >
+                <Text numberOfLines={1} style={styles.editButtonText}>
+                  사진등록
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[
+                  styles.photoActionButton,
+                  {
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderColor: photos.length === 0 ? theme.icon : theme.tint,
+                  },
+                ]}
+                onPress={() => setCoverSelectMode(true)}
+                disabled={photos.length === 0}
+              >
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    styles.editButtonText,
+                    { color: photos.length === 0 ? theme.icon : theme.tint },
+                  ]}
+                >
+                  대표사진변경
+                </Text>
+              </Pressable>
+            </View>
+          </>
+        )}
       </View>
     </ScrollView>
-    {isDeleting && (
+    {(isDeleting || isUpdatingCover) && (
       <View style={styles.deletingOverlay}>
         <ActivityIndicator size="large" color="#FFFFFF" />
       </View>
@@ -673,6 +759,16 @@ export default function CareDetailScreen() {
       initialIndex={lightboxIndex ?? 0}
       onClose={() => setLightboxIndex(null)}
     />
+
+    {clientId && (
+      <PhotoUploadModal
+        visible={uploadVisible}
+        clientId={clientId}
+        isDark={isDark}
+        theme={theme}
+        onClose={handleUploadClose}
+      />
+    )}
 
     <ClientCreateModal
       visible={showClientEditModal}
@@ -926,6 +1022,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  photoActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  photoActionButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   deletingOverlay: {
     ...StyleSheet.absoluteFillObject,
