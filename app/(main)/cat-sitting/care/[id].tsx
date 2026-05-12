@@ -6,8 +6,10 @@ import {
     Linking,
     Pressable,
     ScrollView,
+    StyleProp,
     StyleSheet,
     Text,
+    TextStyle,
     View,
 } from 'react-native';
 
@@ -161,6 +163,18 @@ export default function CareDetailScreen() {
         </Text>
       </View>
 
+      {/* 사진 */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionLabel, { color: theme.icon }]}>사진</Text>
+        <PhotoGrid
+          photos={photos}
+          coverPhotoId={coverPhotoId}
+          onPhotoPress={(index) => setLightboxIndex(index)}
+          cornerBadge="star"
+          isDark={isDark}
+        />
+      </View>
+
       {/* 돌봄 시간 */}
       <View style={styles.section}>
         <Text style={[styles.sectionLabel, { color: theme.icon }]}>돌봄 시간</Text>
@@ -194,24 +208,24 @@ export default function CareDetailScreen() {
       </View>
 
       {/* 출입 메모 */}
-      {care.booking?.client?.entryNote && (
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.icon }]}>출입 메모</Text>
-          <Text style={[styles.sectionValue, { color: theme.text }]}>
-            {care.booking.client.entryNote}
-          </Text>
-        </View>
-      )}
+      <View style={styles.section}>
+        <Text style={[styles.sectionLabel, { color: theme.icon }]}>출입 메모</Text>
+        <ExpandableText
+          text={care.booking?.client?.entryNote ?? '-'}
+          style={[styles.sectionValue, { color: theme.text }]}
+          theme={theme}
+        />
+      </View>
 
       {/* 요구사항 */}
-      {care.booking?.client?.requirements && (
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.icon }]}>요구사항</Text>
-          <Text style={[styles.sectionValue, { color: theme.text }]}>
-            {care.booking.client.requirements}
-          </Text>
-        </View>
-      )}
+      <View style={styles.section}>
+        <Text style={[styles.sectionLabel, { color: theme.icon }]}>요구사항</Text>
+        <ExpandableText
+          text={care.booking?.client?.requirements ?? '-'}
+          style={[styles.sectionValue, { color: theme.text }]}
+          theme={theme}
+        />
+      </View>
 
       {/* 메모 */}
       {care.note && (
@@ -230,18 +244,6 @@ export default function CareDetailScreen() {
           </Text>
         </View>
       )}
-
-      {/* 사진 */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: theme.icon }]}>사진</Text>
-        <PhotoGrid
-          photos={photos}
-          coverPhotoId={coverPhotoId}
-          onPhotoPress={(index) => setLightboxIndex(index)}
-          cornerBadge="star"
-          isDark={isDark}
-        />
-      </View>
 
       {/* 액션 버튼들 */}
       <View style={styles.actions}>
@@ -295,6 +297,40 @@ export default function CareDetailScreen() {
       onClose={() => setLightboxIndex(null)}
     />
     </View>
+  );
+}
+
+type ExpandableTextProps = {
+  text: string;
+  style: StyleProp<TextStyle>;
+  theme: typeof Colors.light;
+};
+
+function ExpandableText({ text, style, theme }: ExpandableTextProps) {
+  const [expanded, setExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const isEmpty = text === '-';
+
+  return (
+    <>
+      <Text
+        style={style}
+        numberOfLines={expanded ? undefined : 1}
+        onTextLayout={(e) => {
+          if (isEmpty || isTruncated) return;
+          if (e.nativeEvent.lines.length > 1) setIsTruncated(true);
+        }}
+      >
+        {text}
+      </Text>
+      {!isEmpty && isTruncated && (
+        <Pressable onPress={() => setExpanded((v) => !v)} hitSlop={8}>
+          <Text style={{ color: theme.icon, fontSize: 13, marginTop: 4 }}>
+            {expanded ? '접기' : '더보기'}
+          </Text>
+        </Pressable>
+      )}
+    </>
   );
 }
 
